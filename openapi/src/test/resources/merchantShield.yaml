@@ -1,0 +1,1233 @@
+openapi: 3.0.0
+info:
+  title: Fraud & Risk Service
+  version: 'v2'
+  description: "Fraud & Risk APIs to detect fraud"
+  contact:
+    name: "Risk Tech Platform Core"
+    email: "RiskTechPlatformCore@expedia.com"
+  x-eg-lifecycle: "PLANNED"
+servers:
+  - url: "https://risk-gateway.test.ersriskp.expedia.com"
+  - url: "https://risk-gateway.prodp.ersriskp.expedia.com"
+tags:
+  - name: "fraud-and-risk"
+paths:
+  '/fraud/v2/order/purchase/screen':
+    post:
+      tags:
+        - fraud-and-risk
+      description: "Fraud & Risk domain Screen APIs v2"
+      summary: "Run fraud screening for one transaction"
+      operationId: "screen"
+      security:
+        - updateAuth:
+            - fraud.clients.screen
+      requestBody:
+        required: true
+        content:
+          'application/json':
+            schema:
+              $ref: "#/components/schemas/OrderPurchaseScreenRequest"
+      parameters:
+        - $ref: "#/components/parameters/contentType"
+      responses:
+        '200':
+          description: "Screening complete"
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/OrderPurchaseScreenResponse"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '401':
+          $ref: "#/components/responses/AuthenticationRequired"
+        '403':
+          $ref: "#/components/responses/Unauthorized"
+        '404':
+          $ref: "#/components/responses/NotFound"
+        '405':
+          $ref: "#/components/responses/MethodNotAllowed"
+        '406':
+          $ref: "#/components/responses/NotAcceptable"
+        '429':
+          $ref: "#/components/responses/TooManyRequests"
+        '500':
+          $ref: "#/components/responses/InternalServerError"
+
+  '/fraud/v4/order/purchase/update':
+    post:
+      tags:
+        - fraud-and-risk
+      description: "Fraud & Risk Order Purchase Update API v4"
+      summary: "Run fraud update for one transaction"
+      operationId: "update"
+      security:
+        - orderPurchaseUpdateAuth:
+            - fraudandrisk.fraud.order-purchase-update
+      requestBody:
+        required: true
+        content:
+          'application/json':
+            schema:
+              $ref: "#/components/schemas/OrderPurchaseUpdateRequest"
+      parameters:
+        - $ref: "#/components/parameters/contentType"
+      responses:
+        '200':
+          description: "The request was successful."
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '401':
+          $ref: "#/components/responses/AuthenticationRequired"
+        '403':
+          $ref: "#/components/responses/Unauthorized"
+        '405':
+          $ref: "#/components/responses/MethodNotAllowed"
+        '406':
+          $ref: "#/components/responses/NotAcceptable"
+        '500':
+          $ref: "#/components/responses/InternalServerError"
+        '502':
+          $ref: "#/components/responses/BadGateway"
+        '503':
+          $ref: "#/components/responses/ServiceUnavailable"
+        '504':
+          $ref: "#/components/responses/GatewayTimeout"
+components:
+  schemas:
+    OrderPurchaseUpdateRequest:
+      type: object
+      required:
+        - risk_id
+        - type
+      properties:
+        type:
+          $ref: "#/components/schemas/UpdateType"
+        risk_id:
+          description: "Id provided by risk stack which causes the given update event."
+          type: string
+          maxLength: 200
+      discriminator:
+        propertyName: type
+        mapping:
+          ORDER_UPDATE: OrderUpdate
+          CHARGEBACK_FEEDBACK: ChargebackFeedback
+          INSULT_FEEDBACK: InsultFeedback
+    UpdateType:
+        description: "Transaction type associated to the update event."
+        type: string
+        enum: [ "ORDER_UPDATE", "CHARGEBACK_FEEDBACK", "INSULT_FEEDBACK" ]
+    OrderUpdate:
+        allOf:
+          - $ref: "#/components/schemas/OrderPurchaseUpdateRequest"
+          - type: object
+            required:
+              - order_status
+            properties:
+              order_status:
+                $ref: "#/components/schemas/Status"
+              cancellation_reason:
+                $ref: "#/components/schemas/CancellationReason"
+    CancellationReason:
+        description: "Reason of order update cancellation."
+        type: object
+        required:
+          - primary_reason_description
+        properties:
+          primary_reason_code:
+            description: "Primary cancellation reason code."
+            type: string
+            maxLength: 200
+          sub_reason_code:
+            description: "Substitute cancellation reason code."
+            type: string
+            maxLength: 200
+          primary_reason_description:
+            description: "Primary cancellation reason description."
+            type: string
+            maxLength: 200
+          sub_reason_description:
+            description: "Substitute cancellation reason description."
+            type: string
+            maxLength: 200
+    ChargebackFeedback:
+        allOf:
+          - $ref: "#/components/schemas/OrderPurchaseUpdateRequest"
+          - type: object
+            properties:
+              chargeback_detail:
+                $ref: "#/components/schemas/ChargebackDetail"
+    InsultFeedback:
+        allOf:
+          - $ref: "#/components/schemas/OrderPurchaseUpdateRequest"
+          - type: object
+            properties:
+              insult_detail:
+                $ref: "#/components/schemas/InsultDetail"
+    ChargebackDetail:
+        type: object
+        description: "Details related to the chargeback."
+        required:
+          - chargeback_reason
+          - chargeback_amount
+          - currency_code
+        properties:
+          chargeback_reason:
+            type: string
+            enum: [ "FRAUD","NON_FRAUD" ]
+            description: "Reason for chargeback which can be Fraud or Non Fraud."
+            maxLength: 200
+          chargeback_amount:
+            type: number
+            format: double
+            description: "Chargeback amount received by the partner."
+            maxLength: 200
+          currency_code:
+            description: "The 3-letter currency code defined in ISO 4217. https://www.currency-iso.org/dam/downloads/lists/list_one.xml."
+            type: string
+            pattern: ^[A-Z]{3}$
+            maxLength: 200
+          bank_reason_code:
+            type: string
+            description: "Unique code provided by the acquiring bank for the category of fraud."
+            maxLength: 200
+          chargeback_reported_timestamp:
+            type: string
+            format: date-time
+            description: "Date and time when the chargeback was reported to the partner."
+    InsultDetail:
+        type: object
+        description: "Details related to the insult."
+        properties:
+          insult_reported_timestamp:
+            type: string
+            format: date-time
+            description: "Date and time when the insult was reported to the partner."
+    Status:
+        description: "Defines the current state of the Order."
+        type: string
+        enum: [ "COMPLETED", "CHANGE_COMPLETED", "CANCELLED", "FAILED", "CHANGE_FAILED" ]
+
+    OrderPurchaseScreenRequest:
+      type: object
+      properties:
+        transaction:
+          $ref: "#/components/schemas/OrderPurchaseTransaction"
+    OrderPurchaseTransaction:
+      type: object
+      properties:
+        site_info:
+          $ref: "#/components/schemas/SiteInfo"
+        device_details:
+          $ref: "#/components/schemas/DeviceDetails"
+        customer_account:
+          $ref: "#/components/schemas/CustomerAccount"
+        transaction_details:
+          $ref: "#/components/schemas/TransactionDetails"
+        bypass_risk_flag:
+          type: boolean
+          description: "A flag to indicate whether the client is ignoring the decision by Trust validation and proceeds to process the even in-case the Trust outcome is ‘Reject’ or ‘Review’."
+    OrderPurchaseScreenResponse:
+      type: object
+      properties:
+        transaction_id:
+          type: string
+          maxLength: 200
+        decision:
+          $ref: "#/components/schemas/FraudDecision"
+        error_detail:
+          $ref: "#/components/schemas/ErrorDetail"
+    FraudDecision:
+      type: string
+      enum:
+        - ACCEPT
+        - REVIEW
+        - REJECT
+        - CHALLENGE
+    ErrorDetail:
+      type: object
+      description: "Error details in case of any errors."
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          description: "Description of the error. Clients may choose to use the description field to display to end clients."
+          type: string
+          maxLength: 200
+        detailed_message:
+          description: "Detailed description of the error."
+          type: string
+          maxLength: 500
+    ExtendedError:
+      description: The object used the describe an error, containing both human-readable and in a machine-readable information.
+      title: ExtendedError
+      type: object
+      properties:
+        type:
+          description: >
+            A URI reference, compliant with the standard EG error type format, which identifies the error type.
+            It provides a machine-readable identifier for the error type.
+            The error type will be aligned with the HTTP status code of the response.
+            The URI can either be absolute or relative to the API's base URI.
+            When dereferenced, it can also provide human-readable documentation for the error type.
+          type: string
+          format: uri
+          example: "https://apis.expediagroup.com/errors/common/invalid-argument"
+        detail:
+          description: A human-readable explanation of the error, specific to this error occurrence.
+          type: string
+          example: "The request failed because one or many input values are invalid. Please see the causes for more details."
+        causes:
+          description: "An array of cause objects, that identify the specific causes of the error."
+          type: array
+          items:
+            $ref: "#/components/schemas/ErrorCause"
+      required:
+        - type
+        - detail
+    Error:
+      description: The object used the describe an error, containing both human-readable and in a machine-readable information.
+      title: Error
+      type: object
+      properties:
+        type:
+          description: >
+            A URI reference, compliant with the standard EG error type format, which identifies the error type.
+            It provides a machine-readable identifier for the error type.
+            The error type will be aligned with the HTTP status code of the response.
+            The URI can either be absolute or relative to the API's base URI.
+            When dereferenced, it can also provide human-readable documentation for the error type.
+          type: string
+          format: uri
+          example: "https://apis.expediagroup.com/errors/common/invalid-argument"
+        detail:
+          description: A human-readable explanation of the error, specific to this error occurrence.
+          type: string
+          example: "The request failed because one or many input values are invalid. Please see the causes for more details."
+      required:
+        - type
+        - detail
+    ErrorCause:
+      description: The object used to describe a cause for an error, containing both human-readable and in a machine-readable information.
+      title: Cause
+      type: object
+      properties:
+        type:
+          description: >
+            A URI reference, compliant with the standard EG error type format, which identifies the cause type.
+            It provides a machine-readable identifier for the cause type.
+            The cause type will be aligned with the error type.
+            The URI can either be absolute or relative to the API's base URI.
+            When dereferenced, it provides human-readable documentation for the cause type.
+          type: string
+          format: uri
+          example: "https://apis.expediagroup.com/errors/common/invalid-number"
+        detail:
+          description: A human-readable explanation of the cause, specific to this cause occurrence.
+          type: string
+          example: "The number of results per page you provided ('NotANumber') is invalid. Please provide a valid integer value between 1 and 100."
+        location:
+          description: |
+            The location of the element in the request that identifies this specific cause. When specified, the `name` will be specified and when applicable, the `value` as well. Can be one of:
+            * `HEADER` - When an error has been identified in one of the request headers.
+            * `PATH` - When an error has been identified in one of the path parameters.
+            * `QUERY` - When an error has been identified in one of the query parameters.
+            * `BODY` - When an error has been identified in the request body.
+          type: string
+          enum:
+            - HEADER
+            - PATH
+            - QUERY
+            - BODY
+          example: QUERY
+        name:
+          description: |
+            The name of the element for this cause. When specified, the `location` will be specified and when applicable, the `value` as well. This name is a function of the value of the `location` property:
+              * When the `location` is set to `HEADER`, this will be the name of the request header (e.g. `Content-Type`).
+              * When the `location` is set to `PATH`, this will be the name of the path parameter (e.g. in a path defined as `/users/{user_id}`, the value would be `user_id`).
+              * When the `location` is set to `QUERY`, this will be the name of the query string parameter (e.g. `offset`).
+              * When the `location` is set to `BODY`, this will one of the field names specified in the body of the request.
+                * For a top level field, it should only be set to the field name (e.g. `firstName`).
+                * For a field in a nested object, it may contain the path to reach the field (e.g. `address.city`).
+                * For a field in an object part of collection, it may contain the index in the collection (e.g. `permissions[0].name`).
+          type: string
+          example: "results_per_page"
+        value:
+          description: >
+            A string representation of the erroneous value of the element identified in `name`, perceived to be the cause of the error.
+            When specified, the `location` and `name` should be specified as well.
+            This value may be omitted in cases where it cannot be provided (e.g. missing require field), or the erroneous value cannot be represented as a string.
+          type: string
+          example: "NotANumber"
+      required:
+        - type
+        - detail
+    SiteInfo:
+      type: object
+      required:
+        - country_code
+        - agent_assisted
+      properties:
+        country_code:
+          description: "The alpha-3 ISO code that represents a country name."
+          type: string
+          maxLength: 10
+        agent_assisted:
+          description: "Identifies if an agent assisted in booking travel for the customer."
+          type: boolean
+    DeviceDetails:
+      required:
+        - device_box
+      type: object
+      properties:
+        source:
+          type: string
+          maxLength: 50
+          description: "Source of the Device ID."
+        device_box:
+          type: string
+          maxLength: 50
+          description: "Device related trustwidget information."
+    TransactionDetails:
+      required:
+        - order_id
+        - order_type
+        - current_order_status
+        - travel_products
+        - travelers
+        - payments
+      type: object
+      properties:
+        order_id:
+          description: "Unique id for the booking."
+          type: string
+          maxLength: 50
+        current_order_status:
+          description: "Status of the booking."
+          type: string
+          enum:
+            - IN_PROGRESS
+        order_type:
+          description: "Type of the booking that can be new or changed."
+          type: string
+          enum:
+            - CREATE
+            - CHANGE
+        travel_products:
+          type: array
+          maxItems: 20
+          items:
+            $ref: '#/components/schemas/TravelProduct'
+        travelers:
+          description: "Individuals on the itinerary who are part of the travel party. At minimum there must be at least 1 traveler."
+          type: array
+          items:
+            $ref: '#/components/schemas/Traveler'
+          maxItems: 30
+        payments:
+          description: "Collection of the form(s) of payment being used to purchase the itinerary.  One or more forms of payment can be used within a booking. Information gathered will be specific to the form of payment.  If more than one of the same form is used, a collection will exist for each unique card/account."
+          type: array
+          items:
+            $ref: '#/components/schemas/Payment'
+          maxItems: 30
+        credit_card_authentication_failure_count:
+          description: "Total auth fail count for given credit card"
+          type: integer
+        itinerary_three_digits_secure_criteria:
+          $ref: "#/components/schemas/ItineraryThreeDSCriteria"
+    ItineraryThreeDSCriteria:
+      description: "The object contains 3DS criteria attributes associated with the current itinerary."
+      type: object
+      properties:
+        travel_product_begin_use_datetime:
+          description: "DateTime on which the travel product ordered would be available in local time with time zone offset to UTC. For example, if I order an hotel for December 25th on November 11th, the preOrder date would be December 25th."
+          type: string
+          format: date-time
+          maxLength: 50
+        travel_product_availability_window_id:
+          description: "Indicates whether the account owner is placing the order for merchandise with a future availability or release date."
+          type: string
+          maxLength: 200
+    CustomerAccount:
+      required:
+        - account_type
+      type: object
+      properties:
+        user_id:
+          description: "Unique identifier assigned to the account owner by the POS."
+          type:  string
+        account_type:
+          description: "Identifies if the customer account is known to the client."
+          type: string
+          enum:
+            - GUEST
+            - STANDARD
+        name:
+          $ref: "#/components/schemas/Name"
+        email_address:
+          description: "email address for the account owner."
+          type: string
+        telephones:
+          type: array
+          items:
+            $ref: "#/components/schemas/Telephone"
+        address:
+          $ref: "#/components/schemas/Address"
+        registered_time:
+          description: "Date and time that the customer first reigstered on the client site."
+          type: string
+          format: date-time
+          maxLength: 50
+    Traveler:
+      type: object
+      required:
+        - traveler_name
+        - email_address
+        - telephones
+        - primary
+      properties:
+        traveler_name:
+          $ref: "#/components/schemas/Name"
+        email_address:
+          description: "Email address associated with the traveler as supplied by the booking system."
+          type: string
+          maxLength: 200
+        telephones:
+          type: array
+          items:
+            $ref: "#/components/schemas/Telephone"
+          maxItems: 250
+        primary:
+          description: "Indicator for one of the travelers who is the primary traveler. One traveler in each itinerary item must be listed as primary. By default, for a single traveler this should be set to true."
+          type: boolean
+        age:
+          description: "Age of the traveler."
+          type: number
+        birth_date:
+          description: "Date of birth for traveler. Will be scrambled upon sending to TxB."
+          type: string
+          format: date-time
+          maxLength: 50
+        citizenship_country_code:
+          description: "Country code of the persons nationality."
+          type: string
+          maxLength: 10
+        traveler_id:
+          description: "Unique identifier for travelers in the itinerary."
+          type: string
+          maxLength: 100
+    Address:
+      required:
+        - address_line1
+        - city
+        - state
+        - zip_code
+        - country_code
+      type: object
+      properties:
+        address_type:
+          type: string
+          enum:
+            - HOME
+            - WORK
+        address_line1:
+          description: "Address line 1 of the address provided."
+          type: string
+          maxLength: 200
+        address_line2:
+          description: "Address line 2 of the address provided."
+          type: string
+          maxLength: 200
+        city:
+          description: "City of the address provided."
+          type: string
+          maxLength: 200
+        state:
+          description: "The two-characters ISO code for the state or province of the address."
+          type: string
+          pattern: ^[A-Z]{2}$
+        zip_code:
+          description: "Zip code of the address provided."
+          type: string
+          maxLength: 20
+        country_code:
+          description: "ISO alpha-3 country code of the address provided."
+          pattern: ^[A-Z]{3}$
+          type: string
+    TravelProduct:
+      required:
+        - type
+        - inventory_type
+        - inventory_source
+        - price
+        - travelers_reference
+      type: object
+      discriminator:
+        propertyName: "type"
+      properties:
+        price:
+          $ref: "#/components/schemas/Amount"
+        type:
+          description: "Type of product advertised on the website."
+          type: string
+          maxLength: 40
+        inventory_type:
+          description: "Type of inventory."
+          type: string
+          maxLength: 30
+        inventory_source:
+          description: "Identifies the business model through which the supply is being sold. Merchant/Agency."
+          type: string
+          maxLength: 30
+        travelers_reference:
+          description: "List of travelerGuids who are part of the traveling party on the itinerary for the product."
+          type: array
+          maxItems: 40
+          items:
+            type: string
+            maxLength: 50
+    Air:
+      allOf:
+        - $ref: "#/components/schemas/TravelProduct"
+        - type: object
+          required:
+            - type
+            - air_segments
+            - departure_time
+            - arrival_time
+          properties:
+            departure_time:
+              description: "Date and time of departure from original departure location. Expressed in GMT with offset to local to departure location."
+              type: string
+              format: date-time
+              maxLength: 50
+            arrival_time:
+              description: "Date and time of arrival to final destination location. Expressed in GMT with offset to local to destination location."
+              type: string
+              format: date-time
+              maxLength: 50
+            air_segments:
+              description: "Airline of the trip segment."
+              type: array
+              items:
+                $ref: "#/components/schemas/AirSegment"
+              maxItems: 30
+            flight_type:
+              description: "Identifies the type of air trip based on the air destinations."
+              type: string
+              enum: [ "ROUNDTRIP", "ONEWAY", "MULTIPLE_DESTINATION" ]
+            pnr:
+              description: "Airline booking confirmation code for the trip."
+              type: string
+              maxLength: 100
+            gds_type:
+              description: "Associated wth PNR."
+              type: string
+              maxLength: 100
+    AirSegment:
+      type: object
+      required:
+        - airline_code
+        - departure_airport_code
+        - arrival_airport_code
+      properties:
+        airline_code:
+          description: "Airline of the trip segment"
+          type: string
+          maxLength: 10
+        departure_airport_code:
+          description: "Departure airport of the trip segment"
+          type: string
+          maxLength: 10
+        arrival_airport_code:
+          description: "Arrival airport of the trip segment"
+          type: string
+          maxLength: 10
+        departure_time:
+          description: "Date and time of departure from departure location. Expressed in GMT with offset to local to departure location."
+          type: string
+          format: date-time
+          maxLength: 50
+        arrival_time:
+          description: "Date and time of arrival to destination location. Expressed in GMT with offset to local to   destination location."
+          type: string
+          format: date-time
+          maxLength: 50
+    Cruise:
+      allOf:
+        - $ref: "#/components/schemas/TravelProduct"
+        - type: object
+          required:
+            - type
+            - departure_time
+            - arrival_time
+            - embarkation_port
+            - disembarkation_port
+            - ship_name
+          properties:
+            departure_time:
+              description: "Local date and time of departure from original departure location, in ISO-8061 date and time format `yyyy-MM-ddTHH:mm:ss.SSSZ`."
+              type: string
+              format: date-time
+              maxLength: 50
+            arrival_time:
+              description: "Local date and time of arrival from original arrival location, in ISO-8061 date and time format `yyyy-MM-ddTHH:mm:ss.SSSZ`."
+              type: string
+              format: date-time
+              maxLength: 50
+            embarkation_port:
+              description: "Location from where cruise will depart."
+              type: string
+              maxLength: 200
+            disembarkation_port:
+              description: "The cruise's final destination."
+              type: string
+              maxLength: 200
+            ship_name:
+              description: "Name of the cruise ship."
+              type: string
+              maxLength: 200
+    Car:
+      allOf:
+        - $ref: "#/components/schemas/TravelProduct"
+        - type: object
+          required:
+            - type
+            - pick_up_location
+            - drop_off_location
+            - pickup_time
+            - return_time
+          properties:
+            pick_up_location:
+              description: "Airport at which the auto will be picked up."
+              type: string
+              maxLength: 200
+            drop_off_location:
+              description: "Airport at which the auto will be returned. If no drop off location specified, this value should be the same airport as the pick up location."
+              type: string
+              maxLength: 200
+            pickup_time:
+              type: string
+              format: date-time
+              maxLength: 50
+            return_time:
+              type: string
+              format: date-time
+              maxLength: 50
+    Hotel:
+      allOf:
+        - $ref: "#/components/schemas/TravelProduct"
+        - type: object
+          required:
+            - type
+            - hotel_id
+            - hotel_name
+            - address
+            - checkin_time
+            - checkout_time
+          properties:
+            hotel_id:
+              description: "Unique hotel identifier specific to fpaas."
+              type: string
+              maxLength: 200
+            price_withheld:
+              description: "Opaque object. Identifies if the product price was withheld from the customer during the booking process."
+              type: boolean
+            hotel_name:
+              description: "Name of the hotel."
+              type: string
+              maxLength: 200
+            room_count:
+              description: "Total number of rooms booked within the hotel product collection."
+              type: integer
+              format: int32
+            address:
+              $ref: "#/components/schemas/Address"
+            checkin_time:
+              type: string
+              format: date-time
+              maxLength: 50
+            checkout_time:
+              type: string
+              format: date-time
+              maxLength: 50
+    Payment:
+      type: object
+      required:
+        - brand
+        - payment_method
+        - billing_name
+      discriminator:
+        propertyName: "payment_method"
+        mapping:
+          CREDIT_CARD: '#/components/schemas/CreditCard'
+          PAYPAL: '#/components/schemas/PayPal'
+          POINTS: '#/components/schemas/Points'
+      properties:
+        brand:
+          description: "Payment brand used for payment on this transaction."
+          type: string
+          maxLength: 200
+        payment_method:
+          $ref: "#/components/schemas/PaymentMethod"
+        payment_reason:
+          $ref: "#/components/schemas/PaymentReason"
+        billing_name:
+          $ref: "#/components/schemas/Name"
+        billing_address:
+          $ref: "#/components/schemas/Address"
+        billing_email_address:
+          description: "Email address associated with the payment party."
+          type: string
+          maxLength: 200
+        payment_instrument_id:
+          description: "Optional for external client. An internal attribute generated inside stack to tokenize PCI data."
+          type: string
+          maxLength: 200
+        authorized_amount:
+          $ref: "#/components/schemas/Amount"
+        verified_amount:
+          $ref: "#/components/schemas/Amount"
+        three_digits_secure_criteria:
+          $ref: "#/components/schemas/PaymentThreeDSCriteria"
+        operations:
+          $ref: "#/components/schemas/Operations"
+        payment_source:
+          $ref: '#/components/schemas/PaymentSource'
+        total_refund_amount:
+          description: "Total amount refunded towards the transaction."
+          type: number
+          format: double
+    PaymentThreeDSCriteria:
+      description: "Payment 3DS criteria attributes."
+      type: object
+      properties:
+        probable_flag:
+          description: "This is a flag passed to us by which indicates that this transaction could potentially go through 3DS."
+          type: string
+          maxLength: 200
+        transaction_model:
+          description: "Model used to process payment transaction."
+          type: string
+          maxLength: 200
+    Operations:
+      type: object
+      properties:
+        verify:
+          $ref: "#/components/schemas/Verify"
+        authorize:
+          $ref: "#/components/schemas/Authorize"
+        authorize_reversal:
+          $ref: "#/components/schemas/AuthorizeReversal"
+        capture:
+          $ref: "#/components/schemas/Capture"
+        refunds:
+          type: array
+          items:
+            $ref: "#/components/schemas/Refund"
+          maxItems: 20
+    Verify:
+      description: "Verify operation on the payment."
+      allOf:
+        - $ref: "#/components/schemas/PaymentOperation"
+        - type: object
+          properties:
+            type:
+              $ref: "#/components/schemas/VerificationType"
+    PaymentReason:
+      description: "The reason of payment."
+      type: string
+      enum:
+        - FULL
+        - DEPOSIT
+        - SCHEDULED
+        - SUBSEQUENT
+        - DEFERRED
+    VerificationType:
+      description: "The type of the verification used to verify the instrument."
+      type: string
+      enum:
+        - "CVV"
+        - "3DS"
+    Authorize:
+      description: "Authorize operation on the payment."
+      allOf:
+        - $ref: "#/components/schemas/PaymentOperation"
+        - type: object
+    AuthorizeReversal:
+      description: "Authorize Reversal operation on the payment."
+      allOf:
+        - $ref: "#/components/schemas/PaymentOperation"
+        - type: object
+    Capture:
+      description: "Capture operation on the payment."
+      allOf:
+        - $ref: "#/components/schemas/PaymentOperation"
+        - type: object
+    Refund:
+      description: "Refund operations on the payment."
+      allOf:
+        - $ref: "#/components/schemas/PaymentOperation"
+        - type: object
+    PaymentOperation:
+      type: object
+      properties:
+        id:
+          type: string
+          maxLength: 200
+        amount:
+          $ref: "#/components/schemas/Amount"
+        outcome:
+          $ref: "#/components/schemas/PaymentOutcome"
+    PaymentOutcome:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/PaymentStatus'
+        code:
+          description: "A mnemonic code for the payment processing."
+          type: string
+          maxLength: 200
+        description:
+          description: "A short description providing additional explanation regarding the mnemonic code."
+          type: string
+          maxLength: 200
+    PaymentStatus:
+      description: "The status of the payment operation."
+      type: string
+      enum: [ "COMPLETED","FAILED" ]
+    PaymentMethod:
+      description: "Additional details about payment method."
+      type: string
+      enum: [ "CREDIT_CARD","PAYPAL","POINTS" ]
+    PaymentSource:
+      type: string
+      enum:
+        - "EXTERNAL"
+        - "INTERNAL"
+    Insurance:
+      allOf:
+        - $ref: "#/components/schemas/TravelProduct"
+        - type: object
+          required:
+            - type
+    CreditCard:
+      allOf:
+        - $ref: "#/components/schemas/Payment"
+        - type: object
+          required:
+            - payment_method
+            - card_number
+            - card_avs_response
+            - card_cvv_response
+            - telephones
+          properties:
+            card_type:
+              description: "Type of card used for payment, eg.master or visa etc."
+              type: string
+              maxLength: 200
+            card_number:
+              description: "All the digits of the credit card number."
+              type: string
+              maxLength: 200
+            expiry_date:
+              description: "Expiration date of the credit card used for payment."
+              type: string
+              format: date-time
+              maxLength: 50
+            eci:
+              description: "Electronic Commerce Indicator."
+              type: string
+              maxLength: 200
+            virtual_credit_card_flag:
+              description: "A flag to indicate that the bank card being used for the charge is a virtual credit card."
+              type: boolean
+            wallet_type:
+              description: "Google vs ApplePay."
+              type: string
+              maxLength: 200
+            card_avs_response:
+              type: string
+              maxLength: 50
+            card_cvv_response:
+              type: string
+              maxLength: 20
+            telephones:
+              type: array
+              items:
+                $ref: "#/components/schemas/Telephone"
+    PayPal:
+      allOf:
+        - $ref: "#/components/schemas/Payment"
+        - type: object
+          required:
+            - payment_method
+            - payer_id
+            - transaction_id
+          properties:
+            payer_id:
+              description: "Unique Identification number associated with the PayPal account."
+              type: string
+              maxLength: 200
+            transaction_id:
+              description: "Unique transaction number to identify Auth calls at PayPal."
+              type: string
+              maxLength: 200
+    Points:
+      allOf:
+        - $ref: "#/components/schemas/Payment"
+        - type: object
+          required:
+            - payment_method
+    Name:
+      description: "Group of attributes intended to hold information about the user's name. A user can have multiple names over time (maiden name, married name, etc.). If multiple names for a single person are associated to a transaction then they should be listed separately in the array."
+      type: object
+      required:
+        - first_name
+        - last_name
+      properties:
+        title:
+          description: "Title of the person for name (e.g. Mr., Ms. etc) maintained within a domain list."
+          type: string
+          maxLength: 200
+        first_name:
+          description: "Given, or first name, of the person."
+          type: string
+          maxLength: 200
+        middle_name:
+          description: "Middle name of the person."
+          type: string
+          maxLength: 200
+        suffix:
+          description: "Generational designations (e.g. Sr, Jr, III) or values indicate that the individual holds a position, educational degree, accreditation, office, or honor (e.g. PhD, CCNA, OBE)."
+          type: string
+          maxLength: 50
+        last_name:
+          description: "Surname, or last name, of the person."
+          type: string
+          maxLength: 200
+        full_name:
+          description: "Full name of the person that includes title, firstName, middleName, LastName, suffix."
+          type: string
+          maxLength: 500
+    Telephone:
+      description: "Group of attributes intended to hold information about phone number associated with the transaction.  A user can have one to many phone numbers (home, work, mobile, etc.). Each number associated with the entity (user, device, supply) should be included in the array."
+      type: object
+      required:
+        - country_access_code
+        - area_code
+        - phone_number
+      properties:
+        type:
+          $ref: "#/components/schemas/TelephoneType"
+        platform_type:
+          $ref: "#/components/schemas/TelephonePlatformType"
+        country_access_code:
+          description: "Numeric digit between 1 to 3 characters used to represent the country code for international dialing.  Does not include symbols, spaces, or leading zeros."
+          type: string
+          maxLength: 25
+        area_code:
+          description: "A number prefixed to an individual telephone number: used in making long-distance calls.  Does not include symbols, spaces, or leading zeros."
+          type: string
+          maxLength: 20
+        phone_number:
+          description: "A number that is dialed on a telephone, without the country or area codes, to reach a particular person, business, etc.  Does not include symbols, spaces, or leading zeros."
+          type: string
+          maxLength: 50
+        full_phone_number:
+          description: "The concatenated countryAccessCode, areaCode, and phoneNumber with leading zeros from the original fields and symbols  (-,.+) removed.  It does not include a phone extension."
+          type: string
+          maxLength: 100
+        extension_number:
+          description: "The number used to reach an individual once a phone connection is established.  Does not include symbols, spaces, or leading zeros.  "
+          type: string
+          maxLength: 20
+        preference_rank:
+          description: "Ranking of order of user preference for contact via text (if type is Mobile) or voice.  0 means no preference.  1 is the primary phone, 2 is the secondary phone, etc."
+          type: number
+        last_verified_timestamp:
+          description: "Date and Time user validated possession of their phone number via a text or voice multi factor authentication challenge, with time zone offset to UTC."
+          type: string
+          format: date-time
+          maxLength: 50
+        verified_flag:
+          description: "Flag indicating whether user passed validation of possession of their phone number via a text or voice multi factor authentication challenge."
+          type: boolean
+    TelephoneType:
+      description: "Classification of the phone and how it relates to the person or entity (e.g. Home, Mobile). "
+      type: string
+      enum: ["HOME", "MOBILE", "BUSINESS", "FAX", "OTHER"]
+    TelephonePlatformType:
+      description: "Classification of the phone platform."
+      type: string
+      enum: ["MOBILE", "LANDLINE", "VOIP"]
+    Email:
+      description: "Group of attributes intended to hold information about email address associated with the transaction.  A user can have one to many emails (home, work, etc.). Each email address associated with the entity (user, device, supply) should be included in the array."
+      type: object
+      properties:
+        email_address:
+          description: "Full email address including the alias, @ symbol, domain, and root domain."
+          type: string
+          maxLength: 200
+    Amount:
+      type: object
+      required:
+        - value
+        - currency_code
+      properties:
+        value:
+          description: "The amount of money expected, required in payment for product in local currency."
+          type: number
+          format: double
+        currency_code:
+          description: "The ISO code for currency."
+          type: string
+          maxLength: 3
+  securitySchemes:
+    updateAuth:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: /oauth/token?provider=eg-identity&grant_type=client_credentials
+          scopes:
+            fraud.clients.screen: Use Fraud Systems for screening orders
+    orderPurchaseUpdateAuth:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: /oauth/token?provider=eg-identity&grant_type=client_credentials
+          scopes:
+            frandandrisk.fraud.order-purchase-update: Use Fraud Systems for updating orders
+
+  responses:
+    BadRequest:
+      description: "The client violated the contract while invoking the API."
+      headers:
+        Date:
+          description: The date the error ocurred
+          schema:
+            type: string
+      content:
+        'application/json':
+          schema:
+            $ref: "#/components/schemas/ExtendedError"
+    AuthenticationRequired:
+      description: "The client is not authenticated"
+      headers:
+        Date:
+          description: The date the error ocurred
+          schema:
+            type: string
+      content:
+        'application/json':
+          schema:
+            $ref: "#/components/schemas/Error"
+    Unauthorized:
+      description: "The authenticated client is not authorized to perform this action."
+      headers:
+        Date:
+          description: The date the error ocurred
+          schema:
+            type: string
+      content:
+        'application/json':
+          schema:
+            $ref: "#/components/schemas/Error"
+    NotFound:
+      description: "The requested resource URL does not map to any API operation."
+      headers:
+        Date:
+          description: The date the error ocurred
+          schema:
+            type: string
+      content:
+        'application/json':
+          schema:
+            $ref: "#/components/schemas/Error"
+    MethodNotAllowed:
+      description: "The specified method (Ex: GET, PUT, DELETE, etc.) is not allowed on this resource."
+      headers:
+        Date:
+          description: The date the error ocurred
+          schema:
+            type: string
+      content:
+        'application/json':
+          schema:
+            $ref: "#/components/schemas/Error"
+    NotAcceptable:
+      description: "The specified Accept header (Ex: application/xml) is not supported for this resource."
+      headers:
+        Date:
+          description: The date the error ocurred
+          schema:
+            type: string
+      content:
+        'application/json':
+          schema:
+            $ref: "#/components/schemas/Error"
+    TooManyRequests:
+      description: "Too many requests allowed for this client for this resource."
+      headers:
+        Date:
+          description: The date the error ocurred
+          schema:
+            type: string
+      content:
+        'application/json':
+          schema:
+            $ref: "#/components/schemas/Error"
+    InternalServerError:
+      description: "A server-side error occurred while processing the request."
+      headers:
+        Date:
+          description: The date the error ocurred
+          schema:
+            type: string
+      content:
+        'application/json':
+          schema:
+            $ref: "#/components/schemas/Error"
+    BadGateway:
+      description: "Problem to connect with the downstream service."
+      headers:
+        Date:
+          description: The date the error occurred.
+          schema:
+            type: string
+      content:
+        'application/json':
+          schema:
+            $ref: "#/components/schemas/Error"
+    ServiceUnavailable:
+      description: "The server is temporarily unable to service the request due to maintenance downtime or capacity problems. The common conditions that prompt this error are failures with backend servers (such as a database connection failure) or when the client exceeded some rate limit set by the server."
+      headers:
+        Date:
+          description: The date the error occurred.
+          schema:
+            type: string
+      content:
+        'application/json':
+          schema:
+            $ref: "#/components/schemas/Error"
+    GatewayTimeout:
+      description: "The server, while acting as a gateway or proxy, did not receive a timely response from the downstream server."
+      headers:
+        Date:
+          description: The date the error occurred.
+          schema:
+            type: string
+      content:
+        'application/json':
+          schema:
+            $ref: "#/components/schemas/Error"
+  parameters:
+    contentType:
+      name: "content-type"
+      in: "header"
+      schema:
+        type: string
+        enum: ['application/json']
+      required: true
