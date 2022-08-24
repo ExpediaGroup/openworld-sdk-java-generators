@@ -21,23 +21,37 @@ jobs:
         with:
           java-version: '11'
           distribution: 'adopt'
-          server-id: oss-sonatype # Value of the distributionManagement/repository/id field of the pom.xml
-          server-username: SONATYPE_USERNAME # env variable for username in deploy
-          server-password: SONATYPE_PASSWORD # env variable for token in deploy
-          # only signed artifacts will be released to maven central. this sets up things for the maven-gpg-plugin
-          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }} # Value of the GPG private key to import
-          gpg-passphrase: GPG_PASSPHRASE # env variable for GPG private key passphrase
-          settings-path: ${{ github.workspace }}
       - id: Build_with_Maven
         run: mvn clean install
-      - name: Generate_SDK_Files
-        env:
-          SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
-          SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
-          GPG_PASSPHRASE: ${{ secrets.GPG_PRIVATE_KEY_PASSPHRASE }}
+      - id: Generate_Sdk_Files
         run: |
-          cd openapi/
-          mvn clean install
           mvn exec:java "-Dnamespace=${{ github.event.inputs.name }}" "-DsdkVersion=${{ github.event.inputs.version }}" "-Dspec=${{ github.event.inputs.fileAsBase64 }}"
-          cd target/sdk
-          mvn deploy --settings $GITHUB_WORKSPACE/settings.xml -B -U -P release -DskipTests=true
+          zip -r sdk.zip target/sdk
+          cd target
+      - name: Send mail
+        uses: dawidd6/action-send-mail@v3
+        with:
+          # Required mail server address:
+          server_address: smtp.gmail.com
+          # Required mail server port:
+          server_port: 465
+          # Optional (recommended): mail server username:
+          username: ${{secrets.MAIL_USERNAME}}
+          # Optional (recommended) mail server password:
+          password: ${{secrets.MAIL_PASSWORD}}
+          # Required mail subject:
+          subject: Github Actions job result
+          # Required recipients' addresses:
+          to: ${{secrets.MAIL_TARGET}}
+          # Required sender full name (address can be skipped):
+          from: ${{secrets.SENDER_NAME}}
+          # cc
+          cc: ${{secrets.MAIL_CC}}
+          # Optional whether this connection use TLS (default is true if server_port is 465)
+          secure: true
+          # Optional plain body:
+          body: Build job of ${{github.repository}} completed successfully!
+          # Optional attachments:
+          attachments: sdk.zip
+          # Optional priority: 'high', 'normal' (default) or 'low'
+          priority: high
