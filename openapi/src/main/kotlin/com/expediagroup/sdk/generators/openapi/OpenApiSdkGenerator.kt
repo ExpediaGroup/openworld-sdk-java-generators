@@ -61,20 +61,16 @@ class OpenApiSdkGenerator {
     fun run() {
         try {
             val config = CodegenConfigurator().apply {
-                setTemplateDir("templates/eg-travel-sdk")
                 val createTempFile = Files.createTempFile("", ".yaml")
-                val bytes = Base64.getDecoder().decode(
-                    inputFile
-                )
-                createTempFile.writeBytes(
-                    bytes
-                )
-                setInputSpec(
-                    createTempFile.toString()
-                )
+                val packageName = namespace.lowercase().replace(Regex("[^a-z0-9]"), "")
+
+                // get the file content as base64 and write it on tmp file
+                createTempFile.writeBytes(Base64.getDecoder().decode(inputFile))
+
+                setTemplateDir("templates/eg-travel-sdk")
+                setInputSpec(createTempFile.toString())
                 setOutputDir(outputDirectory)
                 // Adjust namespace to fit with JVM package naming conventions
-                val packageName = namespace.lowercase().replace(Regex("[^a-z0-9]"), "")
                 // Configure CodeGen Components
                 addGlobalProperty("models", "")
                 addGlobalProperty("apis", "")
@@ -105,10 +101,7 @@ class OpenApiSdkGenerator {
                         TemplateDefinition("README.mustache", "README.md"),
                         TemplateDefinition(
                             "factory.mustache",
-                            "src/main/kotlin/com/expediagroup/openworld/sdk/${
-                            namespace.lowercase().replace(Regex("[^a-z0-9]"), "")
-                            }/configs",
-                            "EnvironmentConfigsFactoryImpl.kt"
+                            "src/main/kotlin/com/expediagroup/openworld/sdk/${namespace.lowercase().replace(Regex("[^a-z0-9]"), "")}/configs"
                         )
                     )
                 )
