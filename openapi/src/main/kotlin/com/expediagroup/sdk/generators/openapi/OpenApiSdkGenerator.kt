@@ -21,6 +21,9 @@ import com.github.rvesse.airline.annotations.Option
 import org.openapitools.codegen.DefaultGenerator
 import org.openapitools.codegen.api.TemplateDefinition
 import org.openapitools.codegen.config.CodegenConfigurator
+import java.nio.file.Files
+import java.util.Base64
+import kotlin.io.path.writeBytes
 
 /**
  * Configures the OpenAPI Generator based on command line parameters to generate an EG Travel SDK project
@@ -59,7 +62,16 @@ class OpenApiSdkGenerator {
         try {
             val config = CodegenConfigurator().apply {
                 setTemplateDir("templates/eg-travel-sdk")
-                setInputSpec(inputFile)
+                val createTempFile = Files.createTempFile("", ".yaml")
+                val bytes = Base64.getDecoder().decode(
+                    inputFile
+                )
+                createTempFile.writeBytes(
+                    bytes
+                )
+                setInputSpec(
+                    createTempFile.toString()
+                )
                 setOutputDir(outputDirectory)
                 // Adjust namespace to fit with JVM package naming conventions
                 val packageName = namespace.lowercase().replace(Regex("[^a-z0-9]"), "")
@@ -80,7 +92,7 @@ class OpenApiSdkGenerator {
                 addAdditionalProperty("authPackage", null)
                 // Configure SDK Artifact Coordinates
                 setGroupId("com.expediagroup.sdk.$namespace")
-                setArtifactId("openworld-java-sdk-$namespace")
+                setArtifactId("$namespace-sdk")
                 setArtifactVersion(version)
                 // Configure package details
                 setPackageName("com.expediagroup.openworld.sdk.$packageName")
@@ -94,7 +106,9 @@ class OpenApiSdkGenerator {
                         TemplateDefinition("README.mustache", "README.md"),
                         TemplateDefinition(
                             "factory.mustache",
-                            "src/main/kotlin/com/expediagroup/openworld/sdk/${namespace.lowercase().replace(Regex("[^a-z0-9]"), "")}/configs",
+                            "src/main/kotlin/com/expediagroup/openworld/sdk/${
+                            namespace.lowercase().replace(Regex("[^a-z0-9]"), "")
+                            }/configs",
                             "EnvironmentConfigsFactoryImpl.kt"
                         )
                     )
