@@ -19,14 +19,21 @@
         <sdk-version>${project.version}</sdk-version>
         <sdk-title>${project.artifactId}</sdk-title>
     </properties>
+    <!-- TODO: Dynamically update RG Open World Core version -->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>@@project.parent.groupId@@</groupId>
+                <artifactId>openworld-java-sdk-core</artifactId>
+                <version>0.0.1-alpha</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
             <groupId>@@project.parent.groupId@@</groupId>
             <artifactId>openworld-java-sdk-core</artifactId>
-
-            <!-- TODO: Dynamically update RG Open World Core version -->
-            <version>0.0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
