@@ -91,7 +91,8 @@ class OpenApiSdkGenerator {
                 addAdditionalProperty("sortParamsByRequiredFlag", true)
                 addAdditionalProperty("authPackage", null)
                 // Configure SDK Artifact Coordinates
-                setArtifactId("openworld-java-sdk-$namespace")
+                setGroupId("com.expediagroup.sdk.$namespace")
+                setArtifactId("$namespace-sdk")
                 setArtifactVersion(version)
                 // Configure package details
                 setPackageName("com.expediagroup.openworld.sdk.$packageName")
