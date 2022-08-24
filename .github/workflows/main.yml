@@ -23,12 +23,14 @@ jobs:
           distribution: 'adopt'
       - id: Build_with_Maven
         run: mvn clean install
-      - id: Generate_Sdk_Files
+      - id: Generate_SDK_Files
         run: |
+          cd openapi/
+          mvn clean install
           mvn exec:java "-Dnamespace=${{ github.event.inputs.name }}" "-DsdkVersion=${{ github.event.inputs.version }}" "-Dspec=${{ github.event.inputs.fileAsBase64 }}"
           zip -r sdk.zip target/sdk
           cd target
-      - name: Send mail
+      - name: deploy_SDK
         uses: dawidd6/action-send-mail@v3
         with:
           # Required mail server address:
