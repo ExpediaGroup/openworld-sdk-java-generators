@@ -15,7 +15,7 @@
 {{^discriminator}}
     data class Builder(
     {{#allVars}}
-        var {{{name}}}: {{#isEnum}}{{^isArray}}{{^isInherited}}{{classname}}.{{{nameInCamelCase}}}{{/isInherited}}{{/isArray}}{{^isArray}}{{#isInherited}}{{{parent}}}.{{{nameInCamelCase}}}{{/isInherited}}{{/isArray}}{{/isEnum}}{{^isEnum}}{{{dataType}}}{{/isEnum}} {{^required}}? = null {{/required}}{{^-last}},{{/-last}}
+        var {{{name}}}: {{#isEnum}}{{^isArray}}{{^isInherited}}{{classname}}.{{{nameInCamelCase}}}{{/isInherited}}{{/isArray}}{{^isArray}}{{#isInherited}}{{{parent}}}.{{{nameInCamelCase}}}{{/isInherited}}{{/isArray}}{{/isEnum}}{{^isEnum}}{{{dataType}}}{{/isEnum}} ? = null{{^-last}},{{/-last}}
     {{/allVars}}
     ) {
     {{#allVars}}
