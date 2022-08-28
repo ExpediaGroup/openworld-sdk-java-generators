@@ -35,3 +35,4 @@ jobs:
   deploy_sdk:
     needs: generate_sdk
     uses: ./.github/workflows/github-release-actions.yml
+    secrets: inherit
