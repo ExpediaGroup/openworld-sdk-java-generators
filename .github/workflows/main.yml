@@ -28,11 +28,10 @@ jobs:
           cd openapi/
           mvn clean install
           mvn exec:java "-Dnamespace=${{ github.event.inputs.name }}" "-DsdkVersion=${{ github.event.inputs.version }}" "-Dspec=${{ github.event.inputs.fileAsBase64 }}"
-          cd target
       - uses: actions/upload-artifact@v2
         with:
           name: sdk
-          path: sdk
+          path: ./openapi/target/sdk
   deploy_sdk:
     needs: generate_sdk
     uses: ./.github/workflows/github-release-actions.yml
