@@ -1,30 +1,8 @@
 name: Openworld SDK Release
 on:
   workflow_call:
-    inputs:
-      gpg_private_key:
-        type: string
-        description: gpg private key
-        required: true
-      gpg_passphrase:
-        type: string
-        description: gpg passphrase
-        required: true
-      sonatype_username:
-        type: string
-        description: sonatype username
-        required: true
-      sonatype_password:
-        type: string
-        description: sonatype password
-        required: true
-      workspace:
-        type: string
-        description: workspace
-        required: true
-
 jobs:
-  release:
+  job:
     runs-on: macos-latest
     steps:
       - uses: actions/download-artifact@v2
@@ -40,15 +18,14 @@ jobs:
           server-username: SONATYPE_USERNAME # env variable for username in deploy
           server-password: SONATYPE_PASSWORD # env variable for token in deploy
           # only signed artifacts will be released to maven central. this sets up things for the maven-gpg-plugin
-          gpg-private-key: ${{ github.event.inputs.gpg_private_key }} # Value of the GPG private key to import
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }} # Value of the GPG private key to import
           gpg-passphrase: GPG_PASSPHRASE # env variable for GPG private key passphrase
-          settings-path: ${{ github.event.inputs.workspace }}
+          settings-path: ${{ github.workspace }}
       - name: "Release artifacts"
         env:
-          SONATYPE_USERNAME: ${{ github.event.inputs.sonatype_username }}
-          SONATYPE_PASSWORD: ${{ github.event.inputs.sonatype_password }}
-          GPG_PASSPHRASE: ${{ github.event.inputs.gpg_passphrase }}
+          SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+          SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PRIVATE_KEY_PASSPHRASE }}
         run: |
           cd sdk
-          mvn clean install
           mvn deploy --settings $GITHUB_WORKSPACE/settings.xml -B -U -P release -DskipTests=true

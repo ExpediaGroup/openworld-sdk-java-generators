@@ -35,9 +35,3 @@ jobs:
   deploy_sdk:
     needs: generate_sdk
     uses: ./.github/workflows/github-release-actions.yml
-    with:
-      gpg_private_key:  ${{ secrets.GPG_PRIVATE_KEY }}
-      gpg_passphrase: ${{ secrets.GPG_PRIVATE_KEY_PASSPHRASE }}
-      sonatype_username: ${{ secrets.SONATYPE_USERNAME }}
-      sonatype_password: ${{ secrets.SONATYPE_PASSWORD }}
-      workspace: ${{ github.workspace }}
