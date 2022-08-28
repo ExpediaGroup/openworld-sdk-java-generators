@@ -33,4 +33,5 @@ jobs:
           name: sdk
           path: target/sdk
   deploy_sdk:
+    needs: generate_sdk
     uses: ./.github/workflows/github-release-actions.yml
