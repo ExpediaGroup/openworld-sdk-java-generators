@@ -7,7 +7,7 @@ package {{apiPackage}}
 
 import com.expediagroup.sdk.core.client.openapi.OpenApiStub
 import com.expediagroup.sdk.core.config.provider.FileConfigurationProvider
-import com.expediagroup.sdk.core.config.RuntimeConfiguration
+import com.expediagroup.sdk.core.configuration.ClientConfiguration
 import io.ktor.client.call.body
 {{#hasFormParams}}import io.ktor.client.request.forms.formData{{/hasFormParams}}
 import io.ktor.client.request.request
@@ -23,13 +23,17 @@ import kotlinx.coroutines.future.future
 * {{{description}}}
 */
 {{#operations}}
-open class {{classname}}(private val runtimeConfiguration: RuntimeConfiguration = RuntimeConfiguration.NONE) : OpenApiStub(runtimeConfiguration) {
+open class {{classname}}(clientConfiguration: ClientConfiguration = ClientConfiguration.EMPTY) : OpenApiStub(clientConfiguration) {
     private val loader = FileConfigurationProvider()[javaClass.classLoader.getResource("sdk.properties")!!]
+
+    private fun removeLeadingSlash(path: String): String {
+         return path.slice(1 until path.length)
+    }
     {{#operation}}
-    private suspend inline fun k{{operationId}}({{#queryParams}}{{{paramName}}}: {{{dataType}}}{{#required}}{{#defaultValue}} = {{^isNumber}}{{{defaultValue}}}{{/isNumber}}{{#isNumber}}{{{defaultValue}}}.toDouble(){{/isNumber}}{{/defaultValue}}{{/required}}{{^required}}?{{#defaultValue}} = {{^isNumber}}{{{defaultValue}}}{{/isNumber}}{{#isNumber}}{{{defaultValue}}}.toDouble(){{/isNumber}}{{/defaultValue}}{{^defaultValue}} = null{{/defaultValue}}{{/required}}{{^-last}},{{/-last}}{{/queryParams}}{{#hasQueryParam}}{{#hasBodyParam}},{{/hasBodyParam}}{{/hasQueryParam}}{{#bodyParam}}{{{paramName}}}: {{{dataType}}}{{#required}}{{#defaultValue}} = {{^isNumber}}{{{defaultValue}}}{{/isNumber}}{{#isNumber}}{{{defaultValue}}}.toDouble(){{/isNumber}}{{/defaultValue}}{{/required}}{{^required}}?{{#defaultValue}} = {{^isNumber}}{{{defaultValue}}}{{/isNumber}}{{#isNumber}}{{{defaultValue}}}.toDouble(){{/isNumber}}{{/defaultValue}}{{^defaultValue}} = null{{/defaultValue}}{{/required}}{{^-last}},{{/-last}}{{/bodyParam}}{{^hasBodyParam}}{{#hasFormParam}},{{/hasFormParam}}{{/hasBodyParam}}{{#formParams}}{{{paramName}}}: {{{dataType}}}{{#required}}{{#defaultValue}} = {{^isNumber}}{{{defaultValue}}}{{/isNumber}}{{#isNumber}}{{{defaultValue}}}.toDouble(){{/isNumber}}{{/defaultValue}}{{/required}}{{^required}}?{{#defaultValue}} = {{^isNumber}}{{{defaultValue}}}{{/isNumber}}{{#isNumber}}{{{defaultValue}}}.toDouble(){{/isNumber}}{{/defaultValue}}{{^defaultValue}} = null{{/defaultValue}}{{/required}}{{^-last}},{{/-last}}{{/formParams}}): {{{returnType}}}{{^returnType}}Unit{{/returnType}} {
+    private suspend inline fun k{{operationId}}({{#queryParams}}{{{paramName}}}: {{{dataType}}}{{#required}}{{#defaultValue}} = {{^isNumber}}{{{defaultValue}}}{{/isNumber}}{{#isNumber}}{{{defaultValue}}}.toDouble(){{/isNumber}}{{/defaultValue}}{{/required}}{{^required}}?{{#defaultValue}} = {{^isNumber}}{{{defaultValue}}}{{/isNumber}}{{#isNumber}}{{{defaultValue}}}.toDouble(){{/isNumber}}{{/defaultValue}}{{^defaultValue}} = null{{/defaultValue}}{{/required}}{{^-last}},{{/-last}}{{/queryParams}}{{#hasQueryParam}}{{#hasBodyParam}},{{/hasBodyParam}}{{/hasQueryParam}}{{#bodyParam}}{{{paramName}}}: {{{dataType}}}{{#required}}{{#defaultValue}} = {{^isNumber}}{{{defaultValue}}}{{/isNumber}}{{#isNumber}}{{{defaultValue}}}.toDouble(){{/isNumber}}{{/defaultValue}}{{/required}}{{^required}}?{{#defaultValue}} = {{^isNumber}}{{{defaultValue}}}{{/isNumber}}{{#isNumber}}{{{defaultValue}}}.toDouble(){{/isNumber}}{{/defaultValue}}{{^defaultValue}} = null{{/defaultValue}}{{/required}}{{^-last}},{{/-last}}{{/bodyParam}}{{^hasBodyParam}}{{#hasFormParam}},{{/hasFormParam}}{{/hasBodyParam}}{{#formParams}}{{{paramName}}}: {{{dataType}}}{{#required}}{{#defaultValue}} = {{^isNumber}}{{{defaultValue}}}{{/isNumber}}{{#isNumber}}{{{defaultValue}}}.toDouble(){{/isNumber}}{{/defaultValue}}{{/required}}{{^required}}?{{#defaultValue}} = {{^isNumber}}{{{defaultValue}}}{{/isNumber}}{{#isNumber}}{{{defaultValue}}}.toDouble(){{/isNumber}}{{/defaultValue}}{{^defaultValue}} = null{{/defaultValue}}{{/required}}{{^-last}},{{/-last}}{{/formParams}}): {{{returnType}}}{{^returnType}}Void?{{/returnType}} {
         val response = client.httpClient.request {
             method = HttpMethod.parse("{{httpMethod}}")
-            url("{{path}}"{{#pathParams}}.replace("{" + "{{baseName}}" + "}", {{#isContainer}}{{paramName}}.joinToString(","){{/isContainer}}{{^isContainer}}"${{{paramName}}}"{{/isContainer}}){{/pathParams}})
+            url(removeLeadingSlash("{{path}}"){{#pathParams}}.replace("{" + "{{baseName}}" + "}", {{#isContainer}}{{paramName}}.joinToString(","){{/isContainer}}{{^isContainer}}"${{{paramName}}}"{{/isContainer}}){{/pathParams}})
             headers.append("x-sdk-title", loader.data()["sdk-title"]!!)
             headers.append("User-agent", "open-world-sdk/${loader.data()["sdk-version"]!!}")
             {{#headerParams}}
@@ -58,7 +62,7 @@ open class {{classname}}(private val runtimeConfiguration: RuntimeConfiguration 
             {{/hasBodyParam}}
         }
         throwIfError(response)
-        return response.body()
+        return {{^returnType}}null{{/returnType}}{{#returnType}}response.body(){{/returnType}}
     }
 
     /**
