@@ -4,7 +4,7 @@ on:
     branches:
       - 'main'
 jobs:
-  generate_sdk:
+  generate-sdk:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
@@ -13,7 +13,7 @@ jobs:
         with:
           java-version: '11'
           distribution: 'adopt'
-      - id: build_with_maven
+      - id: build-with-maven
         run: mvn clean install
       - name: Generate SDK Files
         working-directory: ./openapi
@@ -24,9 +24,9 @@ jobs:
         with:
           name: sdk
           path: ./openapi/target/sdk
-  verify_generated_sdk:
+  verify-generated-sdk:
     runs-on: macos-latest
-    needs: generate_sdk
+    needs: generate-sdk
     steps:
       - uses: actions/download-artifact@v2
         with:
