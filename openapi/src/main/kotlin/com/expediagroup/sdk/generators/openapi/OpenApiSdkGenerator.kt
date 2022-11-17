@@ -61,6 +61,9 @@ class OpenApiSdkGenerator {
     @Option(name = ["-v", "--version"])
     lateinit var version: String
 
+    @Option(name = ["-k", "--isRapid"])
+    lateinit var isRapid: String
+
     fun run() {
         try {
             val config = CodegenConfigurator().apply {
@@ -87,6 +90,7 @@ class OpenApiSdkGenerator {
                 // Configure serialization library
                 addAdditionalProperty("serializationLibrary", "gson")
                 addAdditionalProperty("sortParamsByRequiredFlag", true)
+                addAdditionalProperty("isRapid", isRapid.toBoolean())
                 // Configure SDK Artifact Coordinates
                 setArtifactId("openworld-java-sdk-$namespace")
                 setArtifactVersion(version)

@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.expediagroup.openworld.sdk</groupId>
         <artifactId>openworld-java-sdk-pom</artifactId>
-        <version>0.0.1-alpha.4</version>
+        <version>0.0.2-alpha.1</version>
         <relativePath/>
     </parent>
 
@@ -23,9 +23,10 @@
         <out>${project.build.directory}/sdk/</out>
         <namespace>exemplar</namespace>
         <sdkVersion>0.0.1-SNAPSHOT</sdkVersion>
+        <isRapid>false</isRapid>
 
         <!-- Versions -->
-        <openapi-generator.version>6.0.1</openapi-generator.version>
+        <openapi-generator.version>6.2.1</openapi-generator.version>
     </properties>
 
     <dependencies>
@@ -119,6 +120,8 @@
                                 <argument>${namespace}</argument>
                                 <argument>--version</argument>
                                 <argument>${sdkVersion}</argument>
+                                <argument>--isRapid</argument>
+                                <argument>${isRapid}</argument>
                             </arguments>
                         </configuration>
                     </execution>
