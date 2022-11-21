@@ -44,7 +44,7 @@ open class {{classname}}(clientConfiguration: ClientConfiguration = ClientConfig
     }
 
 {{#operation}}
-    private suspend inline fun k{{operationId}}({{>apiParamsDecleration}}): {{{returnType}}}{{^returnType}}Void?{{/returnType}} {
+    {{^isKotlin}}private {{/isKotlin}}suspend {{^isKotlin}}inline {{/isKotlin}}fun {{^isKotlin}}k{{/isKotlin}}{{operationId}}({{>apiParamsDecleration}}): {{{returnType}}}{{^returnType}}Void?{{/returnType}} {
         val response = client.httpClient.request {
             method = HttpMethod.parse("{{httpMethod}}")
             url(removeLeadingSlash("{{path}}"){{#pathParams}}.replace("{" + "{{baseName}}" + "}", {{#isContainer}}{{paramName}}.joinToString(","){{/isContainer}}{{^isContainer}}"${{{paramName}}}"{{/isContainer}}){{/pathParams}})
@@ -84,6 +84,7 @@ open class {{classname}}(clientConfiguration: ClientConfiguration = ClientConfig
         throwIfError(response)
         return {{^returnType}}null{{/returnType}}{{#returnType}}response.body(){{/returnType}}
     }
+    {{^isKotlin}}
 
     /**
     * {{summary}}
@@ -97,7 +98,7 @@ open class {{classname}}(clientConfiguration: ClientConfiguration = ClientConfig
     fun {{operationId}}({{>apiParamsDecleration}}) = GlobalScope.future(Dispatchers.IO) {
         k{{operationId}}({{>apiParamsPassed}})
     }
-
+    {{/isKotlin}}
 {{/operation}}
 }
 {{/operations}}

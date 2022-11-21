@@ -21,7 +21,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
     {{/discriminator.mappedModels}}
 )
 {{/discriminator}}
-{{#nonPublicApi}}internal {{/nonPublicApi}}{{#discriminator}}interface{{/discriminator}}{{^discriminator}}data class{{/discriminator}} {{classname}} {{^discriminator}} (
+{{#nonPublicApi}}internal {{/nonPublicApi}}{{#discriminator}}interface {{/discriminator}}{{^discriminator}}data class {{/discriminator}}{{classname}} {{^discriminator}}(
 {{#allVars}}
     {{#required}}{{>data_class_req_var}}{{/required}}{{^required}}{{>data_class_opt_var}}{{/required}}{{^-last}},{{/-last}}
 {{^-last}}
@@ -32,7 +32,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 {{#discriminator}}{{#vars}}{{#required}}
     {{>interface_req_var}}{{/required}}{{^required}}
     {{>interface_opt_var}}{{/required}}{{/vars}}{{/discriminator}}
-{{^discriminator}}
+{{^isKotlin}}
+    {{^discriminator}}
     companion object {
          @JvmStatic
         fun builder() = Builder()
@@ -66,7 +67,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
     }
     {{/hasRequired}}
     }
-{{/discriminator}}
+    {{/discriminator}}
+{{/isKotlin}}
 {{#hasEnums}}
     {{#vars}}
         {{#isEnum}}
