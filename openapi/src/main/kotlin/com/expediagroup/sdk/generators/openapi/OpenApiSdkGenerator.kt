@@ -64,7 +64,7 @@ class OpenApiSdkGenerator {
     @Option(name = ["-k", "--isKotlin"])
     lateinit var isKotlin: String
 
-    @Option(name = ["-k", "--isRapid"])
+    @Option(name = ["-r", "--isRapid"])
     lateinit var isRapid: String
 
     fun run() {
@@ -76,7 +76,7 @@ class OpenApiSdkGenerator {
                 setGeneratorName("kotlin")
                 setTemplateDir("templates/openworld-sdk")
                 setInputSpec(
-                    prepareSpecFile()
+                    "/Users/osamasalman/IdeaProjects/openworld-sdk-java-generators/openapi/src/test/resources/rapid-api-without-the-five-headers.yaml"
                 )
                 setOutputDir(outputDirectory)
                 // Configure CodeGen Components
