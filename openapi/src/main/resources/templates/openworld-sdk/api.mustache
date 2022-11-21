@@ -95,7 +95,7 @@ open class {{classname}}(clientConfiguration: ClientConfiguration = ClientConfig
     */
     @JvmOverloads
     fun {{operationId}}({{>apiParamsDecleration}}) = GlobalScope.future(Dispatchers.IO) {
-        k{{operationId}}({{>apiParamsPassing}})
+        k{{operationId}}({{>apiParamsPassed}})
     }
 
 {{/operation}}
