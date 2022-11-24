@@ -94,7 +94,7 @@ open class {{classname}}(clientConfiguration: ClientConfiguration = ClientConfig
 
             when (val cause = e.cause) {
                 is OpenWorldException -> throw cause
-                else -> throw OpenWorldException("Unknown error", e)
+                else -> throw OpenWorldException("OpenWorld Error", e)
             }
         }
     }
