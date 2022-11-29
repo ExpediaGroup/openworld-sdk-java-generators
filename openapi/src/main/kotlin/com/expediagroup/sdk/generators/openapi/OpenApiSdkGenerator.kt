@@ -86,7 +86,7 @@ class OpenApiSdkGenerator {
                 // Configure generated Enum class names
                 addAdditionalProperty("enumPropertyNaming", "UPPERCASE")
                 // Configure CodeGen Language
-                addAdditionalProperty("library", s"jvm-ktor")
+                addAdditionalProperty("library", "jvm-ktor")
                 // Configure serialization library
                 addAdditionalProperty("serializationLibrary", "gson")
                 addAdditionalProperty("sortParamsByRequiredFlag", true)
