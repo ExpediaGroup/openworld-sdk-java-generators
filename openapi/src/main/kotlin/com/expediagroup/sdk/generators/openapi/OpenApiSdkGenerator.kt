@@ -25,7 +25,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.nio.file.Files
-import java.util.Base64
+import java.util.*
 import java.util.zip.ZipInputStream
 import kotlin.io.path.writeBytes
 
@@ -76,7 +76,7 @@ class OpenApiSdkGenerator {
                 setGeneratorName("kotlin")
                 setTemplateDir("templates/openworld-sdk")
                 setInputSpec(
-                    "/Users/osamasalman/IdeaProjects/openworld-sdk-java-generators/openapi/src/test/resources/updated-smashed-rapid-api.yaml"
+                    prepareSpecFile()
                 )
                 setOutputDir(outputDirectory)
                 // Configure CodeGen Components
@@ -110,7 +110,7 @@ class OpenApiSdkGenerator {
                         TemplateDefinition(
                             "factory.mustache",
                             "src/main/kotlin/com/expediagroup/openworld/sdk/${
-                            namespace.lowercase().replace(Regex("[^a-z0-9]"), "")
+                                namespace.lowercase().replace(Regex("[^a-z0-9]"), "")
                             }/configs"
                         )
                     )
