@@ -110,7 +110,7 @@ class OpenApiSdkGenerator {
                         TemplateDefinition(
                             "factory.mustache",
                             "src/main/kotlin/com/expediagroup/openworld/sdk/${
-                                namespace.lowercase().replace(Regex("[^a-z0-9]"), "")
+                            namespace.lowercase().replace(Regex("[^a-z0-9]"), "")
                             }/configs"
                         )
                     )
