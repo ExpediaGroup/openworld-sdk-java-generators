@@ -76,7 +76,7 @@ class OpenApiSdkGenerator {
                 setGeneratorName("kotlin")
                 setTemplateDir("templates/openworld-sdk")
                 setInputSpec(
-                    prepareSpecFile()
+                    "/Users/osamasalman/IdeaProjects/openworld-sdk-java-generators/openapi/src/test/resources/updated-smashed-rapid-api.yaml"
                 )
                 setOutputDir(outputDirectory)
                 // Configure CodeGen Components
