@@ -91,7 +91,7 @@ class OpenApiSdkGenerator {
                 // Configure CodeGen Language
                 addAdditionalProperty("library", "jvm-ktor")
                 // Configure serialization library
-                addAdditionalProperty("serializationLibrary", "gson")
+                addAdditionalProperty("serializationLibrary", "jackson")
                 addAdditionalProperty("sortParamsByRequiredFlag", true)
                 addAdditionalProperty("isKotlin", isKotlin.toBoolean())
                 addAdditionalProperty("isRapid", isRapid.toBoolean())
