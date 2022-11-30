@@ -30,11 +30,9 @@ internal class YamlProcessor(path: String) {
         rootMap = yaml.load<Map<String, Any>>(inputStream).toMutableMap()
     }
 
-    fun unifyTags() {
-        val title = getTitle(rootMap)
-
-        removeTags(rootMap, title)
-        replacePathsTags(rootMap, title)
+    fun unifyTags(tag: String) {
+        removeTags(rootMap, tag)
+        replacePathsTags(rootMap, tag)
     }
 
     fun dump(output: File) {
@@ -42,27 +40,23 @@ internal class YamlProcessor(path: String) {
     }
 
     private fun replacePathsTags(map: MutableMap<String, Any>, title: String) {
-        val pathsMap = getMap(map["paths"])
+        val pathsMap = getMap(map[PATHS])
 
         for (pathKey in pathsMap.keys) {
             val pathMap = getMap(pathsMap[pathKey])
             for (methodKey in pathMap.keys) {
                 val methodMap = getMap(pathMap[methodKey])
-                methodMap["tags"] = listOf(title)
+                methodMap[TAGS] = listOf(title)
                 pathMap[methodKey] = methodMap
             }
             pathsMap[pathKey] = pathMap
         }
-        map["paths"] = pathsMap
+        map[PATHS] = pathsMap
     }
 
     private fun removeTags(map: MutableMap<String, Any>, title: String) {
-        val tagsList = listOf(mapOf(Pair("name", title)))
-        map["tags"] = tagsList
-    }
-
-    private fun getTitle(map: Map<String, Any>): String {
-        return getMap(map["info"])["title"] as String
+        val tagsList = listOf(mapOf(Pair(NAME, title)))
+        map[TAGS] = tagsList
     }
 
     private fun getMap(obj: Any?): MutableMap<Any?, Any?> {
@@ -73,6 +67,9 @@ internal class YamlProcessor(path: String) {
     }
 
     companion object {
+        private const val NAME = "name"
+        private const val PATHS = "paths"
+        private const val TAGS = "tags"
         fun createDumperOptions(): DumperOptions {
             val options = DumperOptions()
             options.indent = 2

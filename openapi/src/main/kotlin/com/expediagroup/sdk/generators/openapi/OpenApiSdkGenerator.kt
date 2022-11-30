@@ -37,6 +37,7 @@ import kotlin.io.path.writeBytes
 @Command(name = "generate", description = "Let's build an EG Travel SDK!")
 class OpenApiSdkGenerator {
     companion object {
+        private val NON_ALPHANUMERIC_REGEX = Regex("[^a-z0-9]")
 
         /**
          * Main Entry Point
@@ -70,9 +71,9 @@ class OpenApiSdkGenerator {
 
     fun run() {
         try {
+            // Adjust namespace to fit with JVM package naming conventions
+            val packageName = namespace.lowercase().replace(NON_ALPHANUMERIC_REGEX, "")
             val config = CodegenConfigurator().apply {
-                // Adjust namespace to fit with JVM package naming conventions
-                val packageName = namespace.lowercase().replace(Regex("[^a-z0-9]"), "")
                 // specify the target language
                 setGeneratorName("kotlin")
                 setTemplateDir("templates/openworld-sdk")
@@ -97,7 +98,7 @@ class OpenApiSdkGenerator {
                 addAdditionalProperty("isKotlin", isKotlin.toBoolean())
                 addAdditionalProperty("isRapid", isRapid.toBoolean())
                 // Configure SDK Artifact Coordinates
-                setArtifactId("openworld-${getSdkLanguage()}-sdk-$namespace")
+                setArtifactId("openworld-${getSdkLanguage()}-sdk-${namespace.lowercase()}")
                 setArtifactVersion(version)
                 // Configure package details
                 setPackageName("com.expediagroup.openworld.sdk.$packageName")
@@ -110,9 +111,7 @@ class OpenApiSdkGenerator {
                         TemplateDefinition("README.mustache", "README.md"),
                         TemplateDefinition(
                             "factory.mustache",
-                            "src/main/kotlin/com/expediagroup/openworld/sdk/${
-                            namespace.lowercase().replace(Regex("[^a-z0-9]"), "")
-                            }/configs"
+                            "src/main/kotlin/com/expediagroup/openworld/sdk/$packageName/configs"
                         )
                     )
                 )
@@ -131,7 +130,7 @@ class OpenApiSdkGenerator {
 
     private fun preProcessSpecFile(path: String): String {
         val yamlProcessor = YamlProcessor(path)
-        yamlProcessor.unifyTags()
+        yamlProcessor.unifyTags(camelCase(namespace))
         val tempFile = Files.createTempFile(UUID.randomUUID().toString(), "temp").toFile()
         yamlProcessor.dump(tempFile)
         return tempFile.path
@@ -157,4 +156,10 @@ class OpenApiSdkGenerator {
         tmpFile.writeBytes(Base64.getDecoder().decode(inputFile))
         return tmpFile.toFile()
     }
+
+    private fun camelCase(string: String): String {
+        return string.split(NON_ALPHANUMERIC_REGEX).joinToString("") { capitalize(it) }
+    }
+
+    private fun capitalize(string: String) = string.replaceFirstChar { it.uppercaseChar() }
 }
