@@ -15,6 +15,7 @@
  */
 package com.expediagroup.sdk.generators.openapi
 
+import com.expediagroup.sdk.generators.yaml.processor.YamlProcessor
 import com.github.rvesse.airline.SingleCommand
 import com.github.rvesse.airline.annotations.Command
 import com.github.rvesse.airline.annotations.Option
@@ -75,9 +76,9 @@ class OpenApiSdkGenerator {
                 // specify the target language
                 setGeneratorName("kotlin")
                 setTemplateDir("templates/openworld-sdk")
-                setInputSpec(
-                    prepareSpecFile()
-                )
+                val path = prepareSpecFile()
+                val processedPath = preProcessSpecFile(path)
+                setInputSpec(processedPath)
                 setOutputDir(outputDirectory)
                 // Configure CodeGen Components
                 addGlobalProperty("models", "")
@@ -127,6 +128,14 @@ class OpenApiSdkGenerator {
     }
 
     private fun getSdkLanguage() = if (isKotlin.toBoolean()) "kotlin" else "java"
+
+    private fun preProcessSpecFile(path: String): String {
+        val yamlProcessor = YamlProcessor(path)
+        yamlProcessor.unifyTags()
+        val tempFile = Files.createTempFile(UUID.randomUUID().toString(), "temp").toFile()
+        yamlProcessor.dump(tempFile)
+        return tempFile.path
+    }
 
     private fun prepareSpecFile(): String {
         val buffer = ByteArray(1024)
