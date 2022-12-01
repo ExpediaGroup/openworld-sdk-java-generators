@@ -78,8 +78,8 @@ class OpenApiSdkGenerator {
                 setGeneratorName("kotlin")
                 setTemplateDir("templates/openworld-sdk")
                 val path = prepareSpecFile()
-                val processedPath = preProcessSpecFile(path)
-                setInputSpec(processedPath)
+                val processedFilePath = preProcessSpecFile(path)
+                setInputSpec(processedFilePath)
                 setOutputDir(outputDirectory)
                 // Configure CodeGen Components
                 addGlobalProperty("models", "")
@@ -158,7 +158,8 @@ class OpenApiSdkGenerator {
     }
 
     private fun camelCase(string: String): String {
-        return string.split(NON_ALPHANUMERIC_REGEX)
-            .joinToString("") { it.replaceFirstChar { char -> char.uppercaseChar() } }
+        return string.split(NON_ALPHANUMERIC_REGEX).joinToString("") { capitalize(it) }
     }
+
+    private fun capitalize(string: String) = string.replaceFirstChar { it.uppercaseChar() }
 }
