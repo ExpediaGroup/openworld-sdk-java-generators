@@ -158,8 +158,7 @@ class OpenApiSdkGenerator {
     }
 
     private fun camelCase(string: String): String {
-        return string.split(NON_ALPHANUMERIC_REGEX).joinToString("") { capitalize(it) }
+        return string.split(NON_ALPHANUMERIC_REGEX)
+            .joinToString("") { it.replaceFirstChar { char -> char.uppercaseChar() } }
     }
-
-    private fun capitalize(string: String) = string.replaceFirstChar { it.uppercaseChar() }
 }

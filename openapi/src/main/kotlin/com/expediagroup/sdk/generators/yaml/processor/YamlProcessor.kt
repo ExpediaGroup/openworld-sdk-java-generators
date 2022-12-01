@@ -15,6 +15,9 @@
  */
 package com.expediagroup.sdk.generators.yaml.processor
 
+import com.expediagroup.sdk.generators.yaml.processor.Constants.INDENTATION_LENGTH
+import com.expediagroup.sdk.generators.yaml.processor.Constants.INDENT_WITH_INDICATOR
+import com.expediagroup.sdk.generators.yaml.processor.Constants.INDICATOR_INDENTATION_LENGTH
 import org.yaml.snakeyaml.DumperOptions
 import org.yaml.snakeyaml.Yaml
 import java.io.File
@@ -22,7 +25,7 @@ import kotlin.io.path.Path
 import kotlin.io.path.inputStream
 
 internal class YamlProcessor(path: String) {
-    private val yaml = Yaml(createDumperOptions())
+    private val yaml = Yaml(dumperOptions)
     private val rootMap: MutableMap<String, Any>
 
     init {
@@ -31,7 +34,7 @@ internal class YamlProcessor(path: String) {
     }
 
     fun unifyTags(tag: String) {
-        removeTags(rootMap, tag)
+        replaceTagsWith(rootMap, tag)
         replacePathsTags(rootMap, tag)
     }
 
@@ -39,14 +42,14 @@ internal class YamlProcessor(path: String) {
         yaml.dump(rootMap, output.bufferedWriter())
     }
 
-    private fun replacePathsTags(map: MutableMap<String, Any>, title: String) {
-        val pathsMap = getMap(map[PATHS])
+    private fun replacePathsTags(map: MutableMap<String, Any>, tag: String) {
+        val pathsMap = convertToMutableMap(map[PATHS])
 
         for (pathKey in pathsMap.keys) {
-            val pathMap = getMap(pathsMap[pathKey])
+            val pathMap = convertToMutableMap(pathsMap[pathKey])
             for (methodKey in pathMap.keys) {
-                val methodMap = getMap(pathMap[methodKey])
-                methodMap[TAGS] = listOf(title)
+                val methodMap = convertToMutableMap(pathMap[methodKey])
+                methodMap[TAGS] = listOf(tag)
                 pathMap[methodKey] = methodMap
             }
             pathsMap[pathKey] = pathMap
@@ -54,30 +57,30 @@ internal class YamlProcessor(path: String) {
         map[PATHS] = pathsMap
     }
 
-    private fun removeTags(map: MutableMap<String, Any>, title: String) {
-        val tagsList = listOf(mapOf(Pair(NAME, title)))
+    private fun replaceTagsWith(map: MutableMap<String, Any>, tag: String) {
+        val tagsList = listOf(mapOf(Pair(NAME, tag)))
         map[TAGS] = tagsList
     }
 
-    private fun getMap(obj: Any?): MutableMap<Any?, Any?> {
+    private fun convertToMutableMap(obj: Any?): MutableMap<Any?, Any?> {
         if (obj is Map<*, *>) {
             return obj.toMutableMap()
         }
-        throw PreProcessingException(obj)
+        throw PreProcessingException("Could not convert object to map")
     }
 
     companion object {
         private const val NAME = "name"
         private const val PATHS = "paths"
         private const val TAGS = "tags"
-        fun createDumperOptions(): DumperOptions {
-            val options = DumperOptions()
-            options.indent = 2
-            options.defaultScalarStyle = DumperOptions.ScalarStyle.PLAIN
-            options.defaultFlowStyle = DumperOptions.FlowStyle.BLOCK
-            options.indicatorIndent = 2
-            options.indentWithIndicator = true
-            return options
+        private val dumperOptions = DumperOptions()
+
+        init {
+            dumperOptions.indent = INDENTATION_LENGTH
+            dumperOptions.indentWithIndicator = INDENT_WITH_INDICATOR
+            dumperOptions.indicatorIndent = INDICATOR_INDENTATION_LENGTH
+            dumperOptions.defaultFlowStyle = DumperOptions.FlowStyle.BLOCK
+            dumperOptions.defaultScalarStyle = DumperOptions.ScalarStyle.PLAIN
         }
     }
 }

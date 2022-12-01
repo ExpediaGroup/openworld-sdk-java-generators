@@ -15,4 +15,5 @@
  */
 package com.expediagroup.sdk.generators.yaml.processor
 
-class PreProcessingException(val obj: Any?) : RuntimeException("Could not convert object to map")
+class PreProcessingException(override val message: String, override val cause: Throwable? = null) :
+    RuntimeException(message, cause)
