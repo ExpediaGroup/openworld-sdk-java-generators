@@ -15,31 +15,37 @@
  */
 package com.expediagroup.sdk.generators.yaml.processor
 
+import com.expediagroup.sdk.generators.openapi.OpenApiSdkGenerator
 import com.expediagroup.sdk.generators.yaml.processor.Constant.INDENTATION_LENGTH
 import com.expediagroup.sdk.generators.yaml.processor.Constant.INDENT_WITH_INDICATOR
 import com.expediagroup.sdk.generators.yaml.processor.Constant.INDICATOR_INDENTATION_LENGTH
 import org.yaml.snakeyaml.DumperOptions
 import org.yaml.snakeyaml.Yaml
-import java.io.File
+import java.nio.file.Files
+import java.util.*
 import kotlin.io.path.Path
 import kotlin.io.path.inputStream
 
-internal class YamlProcessor(path: String) {
+internal class YamlProcessor(path: String, namespace: String) {
     private val yaml = Yaml(dumperOptions)
     private val rootMap: MutableMap<String, Any>
+    private val tag: String
 
     init {
         val inputStream = Path(path).inputStream()
         rootMap = yaml.load<Map<String, Any>>(inputStream).toMutableMap()
+        tag = camelCase(namespace)
     }
 
-    fun unifyTags(tag: String) {
+    private fun unifyTags() {
         replaceTagsWith(rootMap, tag)
         replacePathsTags(rootMap, tag)
     }
 
-    fun dump(output: File) {
-        yaml.dump(rootMap, output.bufferedWriter())
+    private fun dump(): String {
+        val tempFile = Files.createTempFile(UUID.randomUUID().toString(), "temp").toFile()
+        yaml.dump(rootMap, tempFile.bufferedWriter())
+        return tempFile.path
     }
 
     private fun replacePathsTags(map: MutableMap<String, Any>, tag: String) {
@@ -69,6 +75,11 @@ internal class YamlProcessor(path: String) {
         throw PreProcessingException("Could not convert object to map")
     }
 
+    fun process(): String {
+        unifyTags()
+        return dump()
+    }
+
     companion object {
         private const val NAME = "name"
         private const val PATHS = "paths"
@@ -82,5 +93,11 @@ internal class YamlProcessor(path: String) {
             dumperOptions.defaultFlowStyle = DumperOptions.FlowStyle.BLOCK
             dumperOptions.defaultScalarStyle = DumperOptions.ScalarStyle.PLAIN
         }
+
+        private fun camelCase(string: String): String {
+            return string.split(OpenApiSdkGenerator.NON_ALPHANUMERIC_REGEX).joinToString("") { capitalize(it) }
+        }
+
+        private fun capitalize(string: String) = string.replaceFirstChar { it.uppercaseChar() }
     }
 }
