@@ -15,9 +15,9 @@
  */
 package com.expediagroup.sdk.generators.yaml.processor
 
-import com.expediagroup.sdk.generators.yaml.processor.Constants.INDENTATION_LENGTH
-import com.expediagroup.sdk.generators.yaml.processor.Constants.INDENT_WITH_INDICATOR
-import com.expediagroup.sdk.generators.yaml.processor.Constants.INDICATOR_INDENTATION_LENGTH
+import com.expediagroup.sdk.generators.yaml.processor.Constant.INDENTATION_LENGTH
+import com.expediagroup.sdk.generators.yaml.processor.Constant.INDENT_WITH_INDICATOR
+import com.expediagroup.sdk.generators.yaml.processor.Constant.INDICATOR_INDENTATION_LENGTH
 import org.yaml.snakeyaml.DumperOptions
 import org.yaml.snakeyaml.Yaml
 import java.io.File
