@@ -15,7 +15,7 @@
  */
 package com.expediagroup.sdk.generators.openapi
 
-import com.expediagroup.sdk.generators.yaml.processor.YamlProcessor
+import com.expediagroup.sdk.generators.openapi.processor.YamlProcessor
 import com.github.rvesse.airline.SingleCommand
 import com.github.rvesse.airline.annotations.Command
 import com.github.rvesse.airline.annotations.Option
@@ -37,8 +37,6 @@ import kotlin.io.path.writeBytes
 @Command(name = "generate", description = "Let's build an EG Travel SDK!")
 class OpenApiSdkGenerator {
     companion object {
-        internal val NON_ALPHANUMERIC_REGEX = Regex("[^a-z0-9]")
-
         /**
          * Main Entry Point
          *
@@ -72,7 +70,7 @@ class OpenApiSdkGenerator {
     fun run() {
         try {
             // Adjust namespace to fit with JVM package naming conventions
-            val packageName = namespace.lowercase().replace(NON_ALPHANUMERIC_REGEX, "")
+            val packageName = namespace.lowercase().replace(Constant.NON_ALPHANUMERIC_REGEX, "")
             val config = CodegenConfigurator().apply {
                 // specify the target language
                 setGeneratorName("kotlin")

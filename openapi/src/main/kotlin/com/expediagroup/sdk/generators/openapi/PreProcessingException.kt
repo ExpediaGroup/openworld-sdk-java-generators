@@ -13,10 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expediagroup.sdk.generators.yaml.processor
+package com.expediagroup.sdk.generators.openapi
 
-internal object Constant {
-    const val INDENTATION_LENGTH = 2
-    const val INDICATOR_INDENTATION_LENGTH = 2
-    const val INDENT_WITH_INDICATOR = true
-}
+class PreProcessingException(override val message: String, override val cause: Throwable? = null) :
+    RuntimeException(message, cause)

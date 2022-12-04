@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expediagroup.sdk.generators.yaml.processor
+package com.expediagroup.sdk.generators.openapi.processor
 
-import com.expediagroup.sdk.generators.openapi.OpenApiSdkGenerator
-import com.expediagroup.sdk.generators.yaml.processor.Constant.INDENTATION_LENGTH
-import com.expediagroup.sdk.generators.yaml.processor.Constant.INDENT_WITH_INDICATOR
-import com.expediagroup.sdk.generators.yaml.processor.Constant.INDICATOR_INDENTATION_LENGTH
+import com.expediagroup.sdk.generators.openapi.Constant
+import com.expediagroup.sdk.generators.openapi.Constant.INDENTATION_LENGTH
+import com.expediagroup.sdk.generators.openapi.Constant.INDENT_WITH_INDICATOR
+import com.expediagroup.sdk.generators.openapi.Constant.INDICATOR_INDENTATION_LENGTH
+import com.expediagroup.sdk.generators.openapi.PreProcessingException
 import org.yaml.snakeyaml.DumperOptions
 import org.yaml.snakeyaml.Yaml
 import java.nio.file.Files
@@ -95,7 +96,7 @@ internal class YamlProcessor(path: String, namespace: String) {
         }
 
         private fun camelCase(string: String): String {
-            return string.split(OpenApiSdkGenerator.NON_ALPHANUMERIC_REGEX).joinToString("") { capitalize(it) }
+            return string.split(Constant.NON_ALPHANUMERIC_REGEX).joinToString("") { capitalize(it) }
         }
 
         private fun capitalize(string: String) = string.replaceFirstChar { it.uppercaseChar() }
