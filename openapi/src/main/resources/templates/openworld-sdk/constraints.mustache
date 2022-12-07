@@ -3,4 +3,3 @@
 {{#maxItems}}{{#minItems}}@Size(min = {{minItems}}, max = {{maxItems}}){{/minItems}}{{/maxItems}}{{^maxItems}}{{#minItems}}@Size(min = {{minItems}}){{/minItems}}{{/maxItems}}{{#maxItems}}{{^minItems}}@Size(max = {{maxItems}}){{/minItems}}{{/maxItems}}
 {{#minimum}}@Min({{minimum}}{{#exclusiveMinimum}} + 1{{/exclusiveMinimum}}){{/minimum}}
 {{#maximum}}@Max({{maximum}}{{#exclusiveMaximum}} - 1{{/exclusiveMaximum}}){{/maximum}}
-{{#required}}@NotNull{{/required}}
