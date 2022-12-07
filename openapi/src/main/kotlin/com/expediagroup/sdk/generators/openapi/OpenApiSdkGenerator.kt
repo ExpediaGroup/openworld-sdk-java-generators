@@ -83,7 +83,7 @@ class OpenApiSdkGenerator {
                 // Configure CodeGen Components
                 addGlobalProperty("models", "")
                 addGlobalProperty("apis", "")
-                addGlobalProperty("supportingFiles", "pom.xml,README.md")
+                addGlobalProperty("supportingFiles", "pom.xml,README.md,ConstraintViolationException.kt,ConstraintViolation.kt")
                 // Configure generated client suffix eg: AnyNameClient
                 addAdditionalProperty("apiSuffix", "Client")
                 addAdditionalProperty("apiPackage", "com.expediagroup.openworld.sdk.$packageName.client")
@@ -112,6 +112,16 @@ class OpenApiSdkGenerator {
                         TemplateDefinition(
                             "factory.mustache",
                             "src/main/kotlin/com/expediagroup/openworld/sdk/$packageName/configs"
+                        ),
+                        TemplateDefinition(
+                            "constraintViolationException.mustache",
+                            "src/main/kotlin/com/expediagroup/openworld/sdk/$packageName/models/exception/",
+                            "ConstraintViolationException.kt"
+                        ),
+                        TemplateDefinition(
+                            "constraintViolation.mustache",
+                            "src/main/kotlin/com/expediagroup/openworld/sdk/$packageName/models/exception/",
+                            "ConstraintViolation.kt"
                         )
                     )
                 )

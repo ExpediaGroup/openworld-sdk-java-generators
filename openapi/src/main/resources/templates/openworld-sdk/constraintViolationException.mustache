@@ -1,0 +1,8 @@
+package {{packageName}}.models.exception
+
+import com.expediagroup.sdk.core.model.exception.client.OpenWorldClientException
+
+class ConstraintViolationException(
+    message: String,
+    val constraintViolations: List<ConstraintViolation>
+) : OpenWorldClientException(message)

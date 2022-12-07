@@ -1,0 +1,7 @@
+package {{packageName}}.models.exception
+
+data class ConstraintViolation(
+    val fieldName: String,
+    val fieldPath: String,
+    val message: String
+)
