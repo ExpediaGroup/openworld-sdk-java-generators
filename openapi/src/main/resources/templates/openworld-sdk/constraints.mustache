@@ -1,6 +1,6 @@
-{{#pattern}}@Pattern(regexp = "{{{pattern}}}"){{/pattern}}
-{{#maxLength}}{{#minLength}}@Length(min = {{minLength}}, max = {{maxLength}}){{/minLength}}{{/maxLength}}{{^maxLength}}{{#minLength}}@Length(min = {{minLength}}){{/minLength}}{{/maxLength}}{{#maxLength}}{{^minLength}}@Length(max = {{maxLength}}){{/minLength}}{{/maxLength}}
-{{#maxItems}}{{#minItems}}@Size(min = {{minItems}}, max = {{maxItems}}){{/minItems}}{{/maxItems}}{{^maxItems}}{{#minItems}}@Size(min = {{minItems}}){{/minItems}}{{/maxItems}}{{#maxItems}}{{^minItems}}@Size(max = {{maxItems}}){{/minItems}}{{/maxItems}}
-{{#minimum}}@Min({{minimum}}{{#exclusiveMinimum}} + 1{{/exclusiveMinimum}}){{/minimum}}
-{{#maximum}}@Max({{maximum}}{{#exclusiveMaximum}} - 1{{/exclusiveMaximum}}){{/maximum}}
-@Valid
+{{#pattern}}@field:Pattern(regexp = "{{{pattern}}}"){{/pattern}}
+{{#maxLength}}{{#minLength}}@field:Length(min = {{minLength}}, max = {{maxLength}}){{/minLength}}{{/maxLength}}{{^maxLength}}{{#minLength}}@field:Length(min = {{minLength}}){{/minLength}}{{/maxLength}}{{#maxLength}}{{^minLength}}@field:Length(max = {{maxLength}}){{/minLength}}{{/maxLength}}
+{{#maxItems}}{{#minItems}}@field:Size(min = {{minItems}}, max = {{maxItems}}){{/minItems}}{{/maxItems}}{{^maxItems}}{{#minItems}}@field:Size(min = {{minItems}}){{/minItems}}{{/maxItems}}{{#maxItems}}{{^minItems}}@field:Size(max = {{maxItems}}){{/minItems}}{{/maxItems}}
+{{#minimum}}@field:Min({{minimum}}{{#exclusiveMinimum}} + 1{{/exclusiveMinimum}}){{/minimum}}
+{{#maximum}}@field:Max({{maximum}}{{#exclusiveMaximum}} - 1{{/exclusiveMaximum}}){{/maximum}}
+@field:Valid
