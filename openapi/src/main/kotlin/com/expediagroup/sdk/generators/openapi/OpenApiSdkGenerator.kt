@@ -76,14 +76,18 @@ class OpenApiSdkGenerator {
                 // specify the target language
                 setGeneratorName("kotlin")
                 setTemplateDir("templates/openworld-sdk")
-                val path = "/Users/osamasalman/IdeaProjects/openworld-sdk-java-generators/openapi/src/test/resources/fraud-and-risk-specs.yaml"
+                val path =
+                    "/Users/osamasalman/IdeaProjects/openworld-sdk-java-generators/openapi/src/test/resources/fraud-and-risk-specs.yaml"
                 val processedFilePath = preProcessSpecFile(path)
                 setInputSpec(processedFilePath)
                 setOutputDir(outputDirectory)
                 // Configure CodeGen Components
                 addGlobalProperty("models", "")
                 addGlobalProperty("apis", "")
-                addGlobalProperty("supportingFiles", "pom.xml,README.md,ConstraintViolationException.kt,ConstraintViolation.kt")
+                addGlobalProperty(
+                    "supportingFiles",
+                    "pom.xml,README.md,FieldConstraintViolationException.kt,FieldConstraintViolation.kt"
+                )
                 // Configure generated client suffix eg: AnyNameClient
                 addAdditionalProperty("apiSuffix", "Client")
                 addAdditionalProperty("apiPackage", "com.expediagroup.openworld.sdk.$packageName.client")
@@ -105,23 +109,24 @@ class OpenApiSdkGenerator {
             }
             // Load Template Customizations
             val generatorInput = config.toClientOptInput().apply {
+                val packagePath = "src/main/kotlin/com/expediagroup/openworld/sdk/$packageName"
                 userDefinedTemplates(
                     listOf(
                         TemplateDefinition("pom.mustache", "pom.xml"),
                         TemplateDefinition("README.mustache", "README.md"),
                         TemplateDefinition(
                             "factory.mustache",
-                            "src/main/kotlin/com/expediagroup/openworld/sdk/$packageName/configs"
+                            "$packagePath/configs"
                         ),
                         TemplateDefinition(
-                            "constraintViolationException.mustache",
-                            "src/main/kotlin/com/expediagroup/openworld/sdk/$packageName/models/exception/",
-                            "ConstraintViolationException.kt"
+                            "fieldConstraintViolationException.mustache",
+                            "$packagePath/models/exception/",
+                            "FieldConstraintViolationException.kt"
                         ),
                         TemplateDefinition(
-                            "constraintViolation.mustache",
-                            "src/main/kotlin/com/expediagroup/openworld/sdk/$packageName/models/exception/",
-                            "ConstraintViolation.kt"
+                            "fieldConstraintViolation.mustache",
+                            "$packagePath/models/exception/",
+                            "FieldConstraintViolation.kt"
                         )
                     )
                 )
