@@ -62,16 +62,18 @@ open class {{classname}}(clientConfiguration: ClientConfiguration = ClientConfig
     }
 
     private fun validateConstraints(obj: Any) {
-    Validation.byDefaultProvider()
-        .configure()
-        .messageInterpolator(ParameterMessageInterpolator())
-        .buildValidatorFactory().use { factory ->
-            val violations: Set<ConstraintViolation<*>> = factory.validator.validate(obj)
-            throw FieldConstraintViolationException(
-                "Some field constraints have been violated",
-                violations.stream().map { toConstraintViolation(it) }.collect(Collectors.toList())
-            )
-        }
+        Validation.byDefaultProvider()
+            .configure()
+            .messageInterpolator(ParameterMessageInterpolator())
+            .buildValidatorFactory().use { factory ->
+                val violations = factory.validator.validate(obj)
+                if (violations.isNotEmpty()) {
+                    throw FieldConstraintViolationException(
+                        "Some field constraints have been violated",
+                        violations.stream().map { toConstraintViolation(it) }.collect(Collectors.toList())
+                    )
+                }
+            }
     }
 
     private fun toConstraintViolation(violation: ConstraintViolation<*>): FieldConstraintViolation {
