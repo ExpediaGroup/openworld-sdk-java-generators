@@ -3,4 +3,4 @@
 {{#maxItems}}{{#minItems}}@field:Size(min = {{minItems}}, max = {{maxItems}}){{/minItems}}{{/maxItems}}{{^maxItems}}{{#minItems}}@field:Size(min = {{minItems}}){{/minItems}}{{/maxItems}}{{#maxItems}}{{^minItems}}@field:Size(max = {{maxItems}}){{/minItems}}{{/maxItems}}
 {{#minimum}}@field:Min({{minimum}}{{#exclusiveMinimum}} + 1{{/exclusiveMinimum}}){{/minimum}}
 {{#maximum}}@field:Max({{maximum}}{{#exclusiveMaximum}} - 1{{/exclusiveMaximum}}){{/maximum}}
-@field:Valid
+{{^isEnum}}@field:Valid{{/isEnum}}
