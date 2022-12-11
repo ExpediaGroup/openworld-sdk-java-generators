@@ -76,8 +76,7 @@ class OpenApiSdkGenerator {
                 // specify the target language
                 setGeneratorName("kotlin")
                 setTemplateDir("templates/openworld-sdk")
-                val path =
-                    "/Users/osamasalman/IdeaProjects/openworld-sdk-java-generators/openapi/src/test/resources/fraud-and-risk-specs.yaml"
+                val path = prepareSpecFile()
                 val processedFilePath = preProcessSpecFile(path)
                 setInputSpec(processedFilePath)
                 setOutputDir(outputDirectory)
