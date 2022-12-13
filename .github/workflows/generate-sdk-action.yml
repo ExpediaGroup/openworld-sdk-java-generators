@@ -35,3 +35,10 @@ jobs:
         with:
           name: sdk
           path: ./openapi/target/sdk
+  copy:
+    runs-on: ubuntu-latest
+    needs: generate
+    steps:
+      - name: copy
+        run: |
+          cp -a ./openapi/target/sdk/. ./generated/
