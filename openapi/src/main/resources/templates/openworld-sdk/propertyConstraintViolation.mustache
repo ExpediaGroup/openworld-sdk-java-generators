@@ -1,12 +1,11 @@
 package {{packageName}}.models.exception
 
 /**
- * Data class that holds the information of the constraint
- * violation found on the value of a certain property
+ * An entity to represent a constraint violation of a property.
  *
- * @param name The name of the constraint-violated field
- * @param path The path of the constraint-violated field
- * @param message The constraint violation message
+ * @property name The name of the constraint-violated field
+ * @property path The path of the constraint-violated field
+ * @property message The constraint violation message
  */
 data class PropertyConstraintViolation(
     val name: String,
