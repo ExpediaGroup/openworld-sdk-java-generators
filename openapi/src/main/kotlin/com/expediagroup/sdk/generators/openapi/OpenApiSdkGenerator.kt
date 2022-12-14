@@ -85,7 +85,12 @@ class OpenApiSdkGenerator {
                 addGlobalProperty("apis", "")
                 addGlobalProperty(
                     "supportingFiles",
-                    "pom.xml,README.md,FieldConstraintViolationException.kt,FieldConstraintViolation.kt"
+                    listOf(
+                        "pom.xml",
+                        "README.md",
+                        "FieldConstraintViolationException.kt",
+                        "FieldConstraintViolation.kt"
+                    ).joinToString(",")
                 )
                 // Configure generated client suffix eg: AnyNameClient
                 addAdditionalProperty("apiSuffix", "Client")
