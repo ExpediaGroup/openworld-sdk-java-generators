@@ -2,7 +2,7 @@ package {{packageName}}.models.exception
 
 import com.expediagroup.sdk.core.model.exception.client.OpenWorldClientException
 
-class FieldConstraintViolationException(
+class PropertyConstraintViolationException(
     message: String,
-    val constraintViolations: List<FieldConstraintViolation>
+    val constraintViolations: List<PropertyConstraintViolation>
 ) : OpenWorldClientException(message)

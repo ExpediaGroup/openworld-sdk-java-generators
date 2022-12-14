@@ -5,8 +5,8 @@ package {{apiPackage}}
 {{#imports}}
 import {{import}}
 {{/imports}}
-import {{packageName}}.models.exception.FieldConstraintViolationException
-import {{packageName}}.models.exception.FieldConstraintViolation
+import {{packageName}}.models.exception.PropertyConstraintViolationException
+import {{packageName}}.models.exception.PropertyConstraintViolation
 import com.expediagroup.openworld.sdk.fraudprevention.validation.PropertyConstraintsValidator.validateConstraints
 
 {{#isRapid}}

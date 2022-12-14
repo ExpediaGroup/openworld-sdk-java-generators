@@ -1,7 +1,7 @@
 package {{packageName}}.validation
 
-import com.expediagroup.openworld.sdk.fraudprevention.models.exception.FieldConstraintViolation
-import com.expediagroup.openworld.sdk.fraudprevention.models.exception.FieldConstraintViolationException
+import com.expediagroup.openworld.sdk.fraudprevention.models.exception.PropertyConstraintViolation
+import com.expediagroup.openworld.sdk.fraudprevention.models.exception.PropertyConstraintViolationException
 import jakarta.validation.ConstraintViolation
 import jakarta.validation.Validation
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator
@@ -15,7 +15,7 @@ internal object PropertyConstraintsValidator {
             .buildValidatorFactory().use { factory ->
                 val violations = factory.validator.validate(obj)
                 if (violations.isNotEmpty()) {
-                    throw FieldConstraintViolationException(
+                    throw PropertyConstraintViolationException(
                         "Some field constraints have been violated",
                         violations.stream().map { toConstraintViolation(it) }.collect(Collectors.toList())
                     )
@@ -23,8 +23,8 @@ internal object PropertyConstraintsValidator {
             }
     }
 
-    private fun toConstraintViolation(violation: ConstraintViolation<*>): FieldConstraintViolation {
-        return FieldConstraintViolation(
+    private fun toConstraintViolation(violation: ConstraintViolation<*>): PropertyConstraintViolation {
+        return PropertyConstraintViolation(
             violation.propertyPath.iterator().next().name,
             violation.propertyPath.toString(),
             violation.message

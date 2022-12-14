@@ -39,8 +39,8 @@ class OpenApiSdkGenerator {
     private val supportingFilesList = listOf(
         "pom.xml",
         "README.md",
-        "FieldConstraintViolationException.kt",
-        "FieldConstraintViolation.kt",
+        "PropertyConstraintViolationException.kt",
+        "PropertyConstraintViolation.kt",
         "PropertyConstraintsValidator.kt"
     )
 
@@ -123,14 +123,14 @@ class OpenApiSdkGenerator {
                             "$packagePath/configs"
                         ),
                         TemplateDefinition(
-                            "fieldConstraintViolationException.mustache",
+                            "propertyConstraintViolationException.mustache",
                             "$packagePath/models/exception/",
-                            "FieldConstraintViolationException.kt"
+                            "PropertyConstraintViolationException.kt"
                         ),
                         TemplateDefinition(
-                            "fieldConstraintViolation.mustache",
+                            "propertyConstraintViolation.mustache",
                             "$packagePath/models/exception/",
-                            "FieldConstraintViolation.kt"
+                            "PropertyConstraintViolation.kt"
                         ),
                         TemplateDefinition(
                             "propertyConstraintsValidator.mustache",
