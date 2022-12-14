@@ -36,6 +36,13 @@ import kotlin.io.path.writeBytes
  */
 @Command(name = "generate", description = "Let's build an EG Travel SDK!")
 class OpenApiSdkGenerator {
+    private val supportingFilesList = listOf(
+        "pom.xml",
+        "README.md",
+        "FieldConstraintViolationException.kt",
+        "FieldConstraintViolation.kt"
+    )
+
     companion object {
         /**
          * Main Entry Point
@@ -83,15 +90,7 @@ class OpenApiSdkGenerator {
                 // Configure CodeGen Components
                 addGlobalProperty("models", "")
                 addGlobalProperty("apis", "")
-                addGlobalProperty(
-                    "supportingFiles",
-                    listOf(
-                        "pom.xml",
-                        "README.md",
-                        "FieldConstraintViolationException.kt",
-                        "FieldConstraintViolation.kt"
-                    ).joinToString(",")
-                )
+                addGlobalProperty("supportingFiles", supportingFilesList.joinToString(","))
                 // Configure generated client suffix eg: AnyNameClient
                 addAdditionalProperty("apiSuffix", "Client")
                 addAdditionalProperty("apiPackage", "com.expediagroup.openworld.sdk.$packageName.client")
