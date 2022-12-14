@@ -7,6 +7,7 @@ import {{import}}
 {{/imports}}
 import {{packageName}}.models.exception.FieldConstraintViolationException
 import {{packageName}}.models.exception.FieldConstraintViolation
+import com.expediagroup.openworld.sdk.fraudprevention.validation.PropertyConstraintsValidator.validateConstraints
 
 {{#isRapid}}
 import com.expediagroup.sdk.core.client.openapi.RapidOpenApiStub
@@ -59,29 +60,6 @@ open class {{classname}}(clientConfiguration: ClientConfiguration = ClientConfig
     private fun HttpRequestBuilder.appendHeaders() {
         headers.append("x-sdk-title", loader.data()["sdk-title"]!!)
         headers.append("User-agent", userAgent)
-    }
-
-    private fun validateConstraints(obj: Any) {
-        Validation.byDefaultProvider()
-            .configure()
-            .messageInterpolator(ParameterMessageInterpolator())
-            .buildValidatorFactory().use { factory ->
-                val violations = factory.validator.validate(obj)
-                if (violations.isNotEmpty()) {
-                    throw FieldConstraintViolationException(
-                        "Some field constraints have been violated",
-                        violations.stream().map { toConstraintViolation(it) }.collect(Collectors.toList())
-                    )
-                }
-            }
-    }
-
-    private fun toConstraintViolation(violation: ConstraintViolation<*>): FieldConstraintViolation {
-        return FieldConstraintViolation(
-            violation.propertyPath.iterator().next().name,
-            violation.propertyPath.toString(),
-            violation.message
-        )
     }
 
 {{#operation}}

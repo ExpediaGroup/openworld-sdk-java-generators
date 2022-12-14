@@ -40,7 +40,8 @@ class OpenApiSdkGenerator {
         "pom.xml",
         "README.md",
         "FieldConstraintViolationException.kt",
-        "FieldConstraintViolation.kt"
+        "FieldConstraintViolation.kt",
+        "PropertyConstraintsValidator.kt"
     )
 
     companion object {
@@ -130,6 +131,11 @@ class OpenApiSdkGenerator {
                             "fieldConstraintViolation.mustache",
                             "$packagePath/models/exception/",
                             "FieldConstraintViolation.kt"
+                        ),
+                        TemplateDefinition(
+                            "propertyConstraintsValidator.mustache",
+                            "$packagePath/validation/",
+                            "PropertyConstraintsValidator.kt"
                         )
                     )
                 )
