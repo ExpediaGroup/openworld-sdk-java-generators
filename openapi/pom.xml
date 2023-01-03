@@ -68,7 +68,7 @@
         <isRapid>false</isRapid>
 
         <!-- Versions -->
-        <kotlin.version>1.7.22</kotlin.version>
+        <kotlin.version>1.8.0</kotlin.version>
         <openapi-generator.version>6.2.1</openapi-generator.version>
 
         <!-- Plugin Versions -->
