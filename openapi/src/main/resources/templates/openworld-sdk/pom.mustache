@@ -49,6 +49,7 @@
         <sdk-version>${project.version}</sdk-version>
         <sdk-title>${project.artifactId}</sdk-title>
 
+        <java.release>1.8</java.release>
         <kotlin.version>1.8.0</kotlin.version>
         <dokka-plugin.version>1.7.20</dokka-plugin.version>
 
@@ -67,6 +68,12 @@
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator</artifactId>
             <version>8.0.0.Final</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-stdlib</artifactId>
+            <version>${kotlin.version}</version>
         </dependency>
     </dependencies>
 
