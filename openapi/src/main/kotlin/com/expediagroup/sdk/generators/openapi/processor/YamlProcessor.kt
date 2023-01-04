@@ -69,13 +69,6 @@ internal class YamlProcessor(path: String, namespace: String) {
         map[PATHS] = pathsMap
     }
 
-    private fun convertToMutableMap(obj: Any?): MutableMap<Any?, Any?> {
-        if (obj is Map<*, *>) {
-            return obj.toMutableMap()
-        }
-        throw PreProcessingException("Could not convert object to map")
-    }
-
     private fun removeUnwantedHeaders() {
         val pathsMap = convertToMutableMap(rootMap[PATHS])
 
@@ -83,7 +76,7 @@ internal class YamlProcessor(path: String, namespace: String) {
             val pathMap = convertToMutableMap(pathsMap[pathKey])
             for (methodKey in pathMap.keys) {
                 val methodMap = convertToMutableMap(pathMap[methodKey])
-                val parametersList = convertToMutableList(methodMap[PARAMETERS])
+                val parametersList = convertToMutableList(methodMap[PARAMETERS] ?: return)
                 val updatedParametersList = mutableListOf<Any>()
                 for (parameter in parametersList) {
                     val parameterMap = convertToMutableMap(parameter)
@@ -105,6 +98,13 @@ internal class YamlProcessor(path: String, namespace: String) {
     private fun convertToMutableList(obj: Any?): List<Any?> {
         if (obj is List<*>) {
             return obj.toMutableList()
+        }
+        throw PreProcessingException("Could not convert object to map")
+    }
+
+    private fun convertToMutableMap(obj: Any?): MutableMap<Any?, Any?> {
+        if (obj is Map<*, *>) {
+            return obj.toMutableMap()
         }
         throw PreProcessingException("Could not convert object to map")
     }
