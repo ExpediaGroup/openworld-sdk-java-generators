@@ -4,10 +4,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.expediagroup.openworld.sdk</groupId>
-    <artifactId>{{artifactId}}</artifactId>
-    <version>{{artifactVersion}}</version>
-    <name>EG Open World SDK :: {{artifactId}}</name>
-    <description>EG Open World SDK :: {{artifactId}} v{{artifactVersion}}</description>
+    <artifactId>openworld-java-sdk-fraudprevention</artifactId>
+    <version>0.3.0</version>
+    <name>EG Open World SDK :: openworld-java-sdk-fraudprevention</name>
+    <description>EG Open World SDK :: openworld-java-sdk-fraudprevention v0.3.0</description>
     <url>https://github.com/ExpediaGroup/openworld-sdk-java-generators/tree/main/generated</url>
     <inceptionYear>2022</inceptionYear>
 
@@ -51,8 +51,7 @@
         <sdk-version>${project.version}</sdk-version>
         <sdk-title>${project.artifactId}</sdk-title>
 
-        <java.release>1.8</java.release>
-        <kotlin.version>1.8.0</kotlin.version>
+        <kotlin.version>1.7.22</kotlin.version>
         <dokka-plugin.version>1.7.20</dokka-plugin.version>
 
         <build-helper-maven-plugin.version>3.3.0</build-helper-maven-plugin.version>
@@ -75,12 +74,6 @@
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator</artifactId>
             <version>8.0.0.Final</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-stdlib</artifactId>
-            <version>${kotlin.version}</version>
         </dependency>
     </dependencies>
 
