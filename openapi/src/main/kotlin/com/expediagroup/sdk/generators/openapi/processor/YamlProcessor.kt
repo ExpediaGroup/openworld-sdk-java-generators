@@ -45,17 +45,17 @@ internal class YamlProcessor(path: String, namespace: String) {
     }
 
     private fun unifyTags() {
-        replaceTagsWith(rootMap, tag)
-        replacePathsTags(rootMap, tag)
+        replaceTagsWithTag()
+        replacePathsTagsTag()
     }
 
-    private fun replaceTagsWith(map: MutableMap<String, Any>, tag: String) {
+    private fun replaceTagsWithTag() {
         val tagsList = listOf(mapOf(Pair(NAME, tag)))
-        map[TAGS] = tagsList
+        rootMap[TAGS] = tagsList
     }
 
-    private fun replacePathsTags(map: MutableMap<String, Any>, tag: String) {
-        val pathsMap = convertToMutableMap(map[PATHS])
+    private fun replacePathsTagsTag() {
+        val pathsMap = convertToMutableMap(rootMap[PATHS])
 
         for (pathKey in pathsMap.keys) {
             val pathMap = convertToMutableMap(pathsMap[pathKey])
@@ -66,7 +66,7 @@ internal class YamlProcessor(path: String, namespace: String) {
             }
             pathsMap[pathKey] = pathMap
         }
-        map[PATHS] = pathsMap
+        rootMap[PATHS] = pathsMap
     }
 
     private fun removeUnwantedHeaders() {
@@ -76,7 +76,7 @@ internal class YamlProcessor(path: String, namespace: String) {
             val pathMap = convertToMutableMap(pathsMap[pathKey])
             for (methodKey in pathMap.keys) {
                 val methodMap = convertToMutableMap(pathMap[methodKey])
-                val parametersList = convertToMutableList(methodMap[PARAMETERS] ?: return)
+                val parametersList = convertToMutableList(methodMap[PARAMETERS] ?: continue)
                 val updatedParametersList = mutableListOf<Any>()
                 for (parameter in parametersList) {
                     val parameterMap = convertToMutableMap(parameter)
