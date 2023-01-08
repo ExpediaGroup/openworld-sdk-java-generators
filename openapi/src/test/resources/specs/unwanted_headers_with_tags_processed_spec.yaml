@@ -61,6 +61,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Order'
+      parameters: []
   /orders/{id}:
     get:
       tags:
@@ -90,6 +91,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Payment'
+      parameters: []
   /payments/{id}:
     get:
       tags:
