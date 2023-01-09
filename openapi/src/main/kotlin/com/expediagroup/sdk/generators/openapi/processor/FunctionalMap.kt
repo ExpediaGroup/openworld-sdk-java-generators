@@ -21,11 +21,7 @@ import com.expediagroup.sdk.generators.openapi.processor.YamlProcessor.Companion
 internal class FunctionalMap(val map: MutableMap<Any?, Any?>) {
     fun get(key: String) = map[key]
 
-    fun put(key: String, value: List<Any?>) {
-        map[key] = value
-    }
-
-    fun put(key: String, value: Map<Any?, Any?>) {
+    fun put(key: String, value: Any) {
         map[key] = value
     }
 
