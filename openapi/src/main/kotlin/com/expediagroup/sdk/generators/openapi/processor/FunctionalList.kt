@@ -15,10 +15,10 @@
  */
 package com.expediagroup.sdk.generators.openapi.processor
 
-import com.expediagroup.sdk.generators.openapi.processor.Traversable.Companion.convertToMutableMap
+import com.expediagroup.sdk.generators.openapi.processor.YamlProcessor.Companion.convertToMutableMap
 
-internal class TraversableList(private val list: MutableList<Any?>) : Traversable {
-    fun removeIf(predicate: (TraversableMap) -> Boolean) {
-        list.removeIf { element -> predicate(TraversableMap(convertToMutableMap(element))) }
+internal class FunctionalList(private val list: MutableList<Any?>) {
+    fun removeIf(predicate: (FunctionalMap) -> Boolean) {
+        list.removeIf { element -> predicate(FunctionalMap(convertToMutableMap(element))) }
     }
 }

@@ -19,6 +19,7 @@ import com.expediagroup.sdk.generators.openapi.Constant
 import com.expediagroup.sdk.generators.openapi.Constant.INDENTATION_LENGTH
 import com.expediagroup.sdk.generators.openapi.Constant.INDENT_WITH_INDICATOR
 import com.expediagroup.sdk.generators.openapi.Constant.INDICATOR_INDENTATION_LENGTH
+import com.expediagroup.sdk.generators.openapi.PreProcessingException
 import org.yaml.snakeyaml.DumperOptions
 import org.yaml.snakeyaml.Yaml
 import java.nio.file.Files
@@ -28,12 +29,12 @@ import kotlin.io.path.inputStream
 
 internal class YamlProcessor(path: String, namespace: String) {
     private val yaml = Yaml(dumperOptions)
-    private val rootMap: TraversableMap
+    private val rootMap: FunctionalMap
     private val tag: String
 
     init {
         val inputStream = Path(path).inputStream()
-        rootMap = TraversableMap(yaml.load<Map<Any?, Any?>>(inputStream).toMutableMap())
+        rootMap = FunctionalMap(yaml.load<MutableMap<Any?, Any?>>(inputStream).toMutableMap())
         tag = camelCase(namespace)
     }
 
@@ -54,7 +55,7 @@ internal class YamlProcessor(path: String, namespace: String) {
     }
 
     private fun replacePathsTagsTag() {
-        rootMap.mapTraverse(PATHS) { pathsMap ->
+        rootMap.mapApply(PATHS) { pathsMap ->
             pathsMap.forEachMap { pathMap ->
                 pathMap.forEachMap { methodMap ->
                     methodMap.put(TAGS, listOf(tag))
@@ -64,10 +65,10 @@ internal class YamlProcessor(path: String, namespace: String) {
     }
 
     private fun removeUnwantedHeaders() {
-        rootMap.mapTraverse(PATHS) { pathsMap ->
+        rootMap.mapApply(PATHS) { pathsMap ->
             pathsMap.forEachMap { pathMap ->
                 pathMap.forEachMap { methodMap ->
-                    methodMap.listTraverse(PARAMETERS) { parameters ->
+                    methodMap.listApply(PARAMETERS) { parameters ->
                         parameters.removeIf { parameter ->
                             isUnwantedHeader(parameter.get(NAME) as String)
                         }
@@ -107,5 +108,19 @@ internal class YamlProcessor(path: String, namespace: String) {
         }
 
         private fun capitalize(string: String) = string.replaceFirstChar { it.uppercaseChar() }
+
+        fun convertToMutableMap(obj: Any?): MutableMap<Any?, Any?> {
+            if (obj is Map<*, *>) {
+                return obj.toMutableMap()
+            }
+            throw PreProcessingException("Could not convert object to map")
+        }
+
+        fun convertToMutableList(obj: Any?): MutableList<Any?> {
+            if (obj is List<*>) {
+                return obj.toMutableList()
+            }
+            throw PreProcessingException("Could not convert object to list")
+        }
     }
 }

@@ -15,10 +15,10 @@
  */
 package com.expediagroup.sdk.generators.openapi.processor
 
-import com.expediagroup.sdk.generators.openapi.processor.Traversable.Companion.convertToMutableList
-import com.expediagroup.sdk.generators.openapi.processor.Traversable.Companion.convertToMutableMap
+import com.expediagroup.sdk.generators.openapi.processor.YamlProcessor.Companion.convertToMutableList
+import com.expediagroup.sdk.generators.openapi.processor.YamlProcessor.Companion.convertToMutableMap
 
-internal class TraversableMap(val map: MutableMap<Any?, Any?>) : Traversable {
+internal class FunctionalMap(val map: MutableMap<Any?, Any?>) {
     fun get(key: String) = map[key]
 
     fun put(key: String, value: List<Any?>) {
@@ -29,22 +29,22 @@ internal class TraversableMap(val map: MutableMap<Any?, Any?>) : Traversable {
         map[key] = value
     }
 
-    fun mapTraverse(key: String, block: (TraversableMap) -> Unit) {
+    fun mapApply(key: String, block: (FunctionalMap) -> Unit) {
         val traversingMap = convertToMutableMap(map[key] ?: mapOf<Any?, Any?>())
-        block(TraversableMap(traversingMap))
+        block(FunctionalMap(traversingMap))
         put(key, traversingMap)
     }
 
-    fun listTraverse(key: String, block: (TraversableList) -> Unit) {
+    fun listApply(key: String, block: (FunctionalList) -> Unit) {
         val traversingList = convertToMutableList(map[key] ?: listOf<Any?>())
-        block(TraversableList(traversingList))
+        block(FunctionalList(traversingList))
         put(key, traversingList)
     }
 
-    fun forEachMap(block: (TraversableMap) -> Unit) {
+    fun forEachMap(block: (FunctionalMap) -> Unit) {
         for (key in map.keys) {
             val childMap = convertToMutableMap(map[key])
-            block(TraversableMap(childMap))
+            block(FunctionalMap(childMap))
             map[key] = childMap
         }
     }
