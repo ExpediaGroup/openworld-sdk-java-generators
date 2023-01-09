@@ -15,8 +15,8 @@
  */
 package com.expediagroup.sdk.generators.openapi.processor
 
-import com.expediagroup.sdk.generators.openapi.processor.YamlProcessor.Companion.convertToMutableList
-import com.expediagroup.sdk.generators.openapi.processor.YamlProcessor.Companion.convertToMutableMap
+import com.expediagroup.sdk.generators.openapi.PreProcessingException
+import com.expediagroup.sdk.generators.openapi.processor.FunctionalList.Companion.toMutableList
 
 internal class FunctionalMap(val map: MutableMap<Any?, Any?>) {
     fun get(key: String) = map[key]
@@ -26,13 +26,13 @@ internal class FunctionalMap(val map: MutableMap<Any?, Any?>) {
     }
 
     fun mapApply(key: String, block: (FunctionalMap) -> Unit) {
-        val traversingMap = convertToMutableMap(map[key] ?: mapOf<Any?, Any?>())
+        val traversingMap = toMutableMap(map[key])
         block(FunctionalMap(traversingMap))
         put(key, traversingMap)
     }
 
     fun listApply(key: String, block: (FunctionalList) -> Unit) {
-        val traversingList = convertToMutableList(map[key] ?: listOf<Any?>())
+        val traversingList = toMutableList(map[key])
         block(FunctionalList(traversingList))
         put(key, traversingList)
     }
@@ -40,6 +40,16 @@ internal class FunctionalMap(val map: MutableMap<Any?, Any?>) {
     fun forEachMap(block: (FunctionalMap) -> Unit) {
         map.keys.forEach { key ->
             mapApply(key as String, block)
+        }
+    }
+
+    companion object {
+        fun toMutableMap(obj: Any?): MutableMap<Any?, Any?> {
+            obj ?: return mutableMapOf()
+            if (obj is Map<*, *>) {
+                return obj.toMutableMap()
+            }
+            throw PreProcessingException("Could not convert object to map")
         }
     }
 }

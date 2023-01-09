@@ -15,10 +15,21 @@
  */
 package com.expediagroup.sdk.generators.openapi.processor
 
-import com.expediagroup.sdk.generators.openapi.processor.YamlProcessor.Companion.convertToMutableMap
+import com.expediagroup.sdk.generators.openapi.PreProcessingException
+import com.expediagroup.sdk.generators.openapi.processor.FunctionalMap.Companion.toMutableMap
 
 internal class FunctionalList(private val list: MutableList<Any?>) {
     fun removeIf(predicate: (FunctionalMap) -> Boolean) {
-        list.removeIf { element -> predicate(FunctionalMap(convertToMutableMap(element))) }
+        list.removeIf { element -> predicate(FunctionalMap(toMutableMap(element))) }
+    }
+
+    companion object {
+        fun toMutableList(obj: Any?): MutableList<Any?> {
+            obj ?: return mutableListOf()
+            if (obj is List<*>) {
+                return obj.toMutableList()
+            }
+            throw PreProcessingException("Could not convert object to list")
+        }
     }
 }
