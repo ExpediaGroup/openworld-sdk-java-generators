@@ -19,7 +19,6 @@ import com.expediagroup.sdk.generators.openapi.Constant
 import com.expediagroup.sdk.generators.openapi.Constant.INDENTATION_LENGTH
 import com.expediagroup.sdk.generators.openapi.Constant.INDENT_WITH_INDICATOR
 import com.expediagroup.sdk.generators.openapi.Constant.INDICATOR_INDENTATION_LENGTH
-import com.expediagroup.sdk.generators.openapi.PreProcessingException
 import org.yaml.snakeyaml.DumperOptions
 import org.yaml.snakeyaml.Yaml
 import java.nio.file.Files
@@ -29,62 +28,71 @@ import kotlin.io.path.inputStream
 
 internal class YamlProcessor(path: String, namespace: String) {
     private val yaml = Yaml(dumperOptions)
-    private val rootMap: MutableMap<String, Any>
+    private val rootMap: FunctionalMap
     private val tag: String
 
     init {
         val inputStream = Path(path).inputStream()
-        rootMap = yaml.load<Map<String, Any>>(inputStream).toMutableMap()
+        rootMap = FunctionalMap(yaml.load(inputStream))
         tag = camelCase(namespace)
-    }
-
-    private fun unifyTags() {
-        replaceTagsWith(rootMap, tag)
-        replacePathsTags(rootMap, tag)
-    }
-
-    private fun dump(): String {
-        val tempFile = Files.createTempFile(UUID.randomUUID().toString(), "temp").toFile()
-        yaml.dump(rootMap, tempFile.bufferedWriter())
-        return tempFile.path
-    }
-
-    private fun replacePathsTags(map: MutableMap<String, Any>, tag: String) {
-        val pathsMap = convertToMutableMap(map[PATHS])
-
-        for (pathKey in pathsMap.keys) {
-            val pathMap = convertToMutableMap(pathsMap[pathKey])
-            for (methodKey in pathMap.keys) {
-                val methodMap = convertToMutableMap(pathMap[methodKey])
-                methodMap[TAGS] = listOf(tag)
-                pathMap[methodKey] = methodMap
-            }
-            pathsMap[pathKey] = pathMap
-        }
-        map[PATHS] = pathsMap
-    }
-
-    private fun replaceTagsWith(map: MutableMap<String, Any>, tag: String) {
-        val tagsList = listOf(mapOf(Pair(NAME, tag)))
-        map[TAGS] = tagsList
-    }
-
-    private fun convertToMutableMap(obj: Any?): MutableMap<Any?, Any?> {
-        if (obj is Map<*, *>) {
-            return obj.toMutableMap()
-        }
-        throw PreProcessingException("Could not convert object to map")
     }
 
     fun process(): String {
         unifyTags()
+        removeUnwantedHeaders()
         return dump()
+    }
+
+    private fun unifyTags() {
+        replaceTagsWithTag()
+        replacePathsTagsTag()
+    }
+
+    private fun replaceTagsWithTag() {
+        val tagsList = listOf(mapOf(Pair(NAME, tag)))
+        rootMap.put(TAGS, tagsList)
+    }
+
+    private fun replacePathsTagsTag() {
+        rootMap.mapApply(PATHS) { pathsMap ->
+            pathsMap.forEachMap { pathMap ->
+                pathMap.forEachMap { methodMap ->
+                    methodMap.put(TAGS, listOf(tag))
+                }
+            }
+        }
+    }
+
+    private fun removeUnwantedHeaders() {
+        rootMap.mapApply(PATHS) { pathsMap ->
+            pathsMap.forEachMap { pathMap ->
+                pathMap.forEachMap { methodMap ->
+                    methodMap.listApply(PARAMETERS) { parameters ->
+                        parameters.removeIf { parameter ->
+                            isUnwantedHeader(parameter.get(NAME) as String)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun isUnwantedHeader(parameterName: String) = UNWANTED_HEADERS.contains(parameterName.lowercase())
+
+    private fun dump(): String {
+        val tempFile = Files.createTempFile(UUID.randomUUID().toString(), TEMP).toFile()
+        yaml.dump(rootMap.map, tempFile.bufferedWriter())
+        return tempFile.path
     }
 
     companion object {
         private const val NAME = "name"
         private const val PATHS = "paths"
         private const val TAGS = "tags"
+        private const val TEMP = "temp"
+        private const val PARAMETERS = "parameters"
+        private val UNWANTED_HEADERS =
+            listOf("accept", "accept-encoding", "user-agent", "authorization", "content-type")
         private val dumperOptions = DumperOptions()
 
         init {
