@@ -34,7 +34,7 @@ internal class YamlProcessor(path: String, namespace: String) {
 
     init {
         val inputStream = Path(path).inputStream()
-        rootMap = FunctionalMap(yaml.load<MutableMap<Any?, Any?>>(inputStream).toMutableMap())
+        rootMap = FunctionalMap(yaml.load(inputStream))
         tag = camelCase(namespace)
     }
 

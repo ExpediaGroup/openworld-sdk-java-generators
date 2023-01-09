@@ -42,10 +42,8 @@ internal class FunctionalMap(val map: MutableMap<Any?, Any?>) {
     }
 
     fun forEachMap(block: (FunctionalMap) -> Unit) {
-        for (key in map.keys) {
-            val childMap = convertToMutableMap(map[key])
-            block(FunctionalMap(childMap))
-            map[key] = childMap
+        map.keys.forEach { key ->
+            mapApply(key as String, block)
         }
     }
 }
