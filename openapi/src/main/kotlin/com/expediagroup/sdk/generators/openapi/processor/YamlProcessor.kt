@@ -80,7 +80,7 @@ internal class YamlProcessor(path: String, namespace: String) {
     private fun isUnwantedHeader(parameterName: String) = UNWANTED_HEADERS.contains(parameterName.lowercase())
 
     private fun dump(): String {
-        val tempFile = Files.createTempFile(UUID.randomUUID().toString(), "temp").toFile()
+        val tempFile = Files.createTempFile(UUID.randomUUID().toString(), TEMP).toFile()
         yaml.dump(rootMap.map, tempFile.bufferedWriter())
         return tempFile.path
     }
@@ -89,6 +89,7 @@ internal class YamlProcessor(path: String, namespace: String) {
         private const val NAME = "name"
         private const val PATHS = "paths"
         private const val TAGS = "tags"
+        private const val TEMP = "temp"
         private const val PARAMETERS = "parameters"
         private val UNWANTED_HEADERS =
             listOf("accept", "accept-encoding", "user-agent", "authorization", "content-type")
