@@ -25,9 +25,9 @@ internal class FunctionalMap(val map: MutableMap<Any?, Any?>) {
         map[key] = value
     }
 
-    fun mapApply(key: String, block: (FunctionalMap) -> Unit) {
+    fun mapApply(key: String, block: (String, FunctionalMap) -> Unit) {
         val traversingMap = toMutableMap(map[key])
-        block(FunctionalMap(traversingMap))
+        block(key, FunctionalMap(traversingMap))
         put(key, traversingMap)
     }
 
@@ -37,7 +37,7 @@ internal class FunctionalMap(val map: MutableMap<Any?, Any?>) {
         put(key, traversingList)
     }
 
-    fun forEachMap(block: (FunctionalMap) -> Unit) {
+    fun forEachMap(block: (String, FunctionalMap) -> Unit) {
         map.keys.forEach { key ->
             mapApply(key as String, block)
         }

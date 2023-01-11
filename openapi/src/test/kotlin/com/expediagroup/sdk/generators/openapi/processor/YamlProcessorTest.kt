@@ -7,7 +7,7 @@ import java.io.File
 
 class YamlProcessorTest {
     @ParameterizedTest
-    @ValueSource(strings = ["tags", "unwanted_headers", "unwanted_headers_with_tags"])
+    @ValueSource(strings = ["tags", "unwanted_headers", "unwanted_headers_with_tags", "unwanted_headers_referenced"])
     internal fun `process spec as expected`(specName: String) {
         val tag = "SomeTag"
         val path = getResourcePath("${specName}_spec.yaml")

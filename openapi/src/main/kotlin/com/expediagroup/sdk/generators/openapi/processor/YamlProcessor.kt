@@ -54,9 +54,9 @@ internal class YamlProcessor(path: String, namespace: String) {
     }
 
     private fun replacePathsTagsTag() {
-        rootMap.mapApply(PATHS) { pathsMap ->
-            pathsMap.forEachMap { pathMap ->
-                pathMap.forEachMap { methodMap ->
+        rootMap.mapApply(PATHS) { _, pathsMap ->
+            pathsMap.forEachMap { _, pathMap ->
+                pathMap.forEachMap { _, methodMap ->
                     methodMap.put(TAGS, listOf(tag))
                 }
             }
@@ -64,12 +64,15 @@ internal class YamlProcessor(path: String, namespace: String) {
     }
 
     private fun removeUnwantedHeaders() {
-        rootMap.mapApply(PATHS) { pathsMap ->
-            pathsMap.forEachMap { pathMap ->
-                pathMap.forEachMap { methodMap ->
+        val unwantedComponentsParameters = getUnwantedComponentsParameters()
+
+        rootMap.mapApply(PATHS) { _, pathsMap ->
+            pathsMap.forEachMap { _, pathMap ->
+                pathMap.forEachMap { _, methodMap ->
                     methodMap.listApply(PARAMETERS) { parameters ->
                         parameters.removeIf { parameter ->
-                            isUnwantedHeader(parameter.get(NAME) as String)
+                            isUnwantedComponentsParameter(parameter, unwantedComponentsParameters)
+                                    || isUnwantedHeader(parameter)
                         }
                     }
                 }
@@ -77,7 +80,27 @@ internal class YamlProcessor(path: String, namespace: String) {
         }
     }
 
-    private fun isUnwantedHeader(parameterName: String) = UNWANTED_HEADERS.contains(parameterName.lowercase())
+    private fun getUnwantedComponentsParameters(): MutableList<String> {
+        val unwantedComponentsParameters = mutableListOf<String>()
+        rootMap.mapApply(COMPONENTS) { _, componentsMap ->
+            componentsMap.mapApply(PARAMETERS) { _, parameters ->
+                parameters.forEachMap { key, parameter ->
+                    if (isUnwantedHeader(parameter)) {
+                        unwantedComponentsParameters.add(toComponentsParameterRef(key))
+                    }
+                }
+            }
+        }
+        return unwantedComponentsParameters
+    }
+
+    private fun isUnwantedHeader(parameter: FunctionalMap) =
+        parameter.get(NAME)?.let { UNWANTED_HEADERS.contains((it as String).lowercase()) } ?: false
+
+    private fun isUnwantedComponentsParameter(parameter: FunctionalMap, unwantedDefinedParameters: List<String>) =
+        parameter.get(REF)?.let { unwantedDefinedParameters.contains(it as String) } ?: false
+
+    private fun toComponentsParameterRef(ref: String) = "$COMPONENTS_PARAMETER$ref"
 
     private fun dump(): String {
         val tempFile = Files.createTempFile(UUID.randomUUID().toString(), TEMP).toFile()
@@ -88,9 +111,12 @@ internal class YamlProcessor(path: String, namespace: String) {
     companion object {
         private const val NAME = "name"
         private const val PATHS = "paths"
+        private const val COMPONENTS = "components"
         private const val TAGS = "tags"
         private const val TEMP = "temp"
+        private const val REF = "\$ref"
         private const val PARAMETERS = "parameters"
+        private const val COMPONENTS_PARAMETER = "#/components/parameters/"
         private val UNWANTED_HEADERS =
             listOf("accept", "accept-encoding", "user-agent", "authorization", "content-type")
         private val dumperOptions = DumperOptions()

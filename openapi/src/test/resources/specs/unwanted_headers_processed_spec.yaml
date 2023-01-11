@@ -50,5 +50,6 @@ components:
           format: int64
         name:
           type: string
+  parameters: {}
 tags:
   - name: SomeTag

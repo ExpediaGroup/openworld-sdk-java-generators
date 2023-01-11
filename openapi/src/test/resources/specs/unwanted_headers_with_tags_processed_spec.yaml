@@ -116,3 +116,4 @@ components:
   schemas:
     User:
       type: object
+  parameters: {}
