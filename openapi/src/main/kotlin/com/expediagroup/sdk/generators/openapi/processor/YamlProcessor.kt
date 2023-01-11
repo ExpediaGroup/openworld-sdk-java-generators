@@ -45,7 +45,7 @@ internal class YamlProcessor(path: String, namespace: String) {
 
     private fun unifyTags() {
         replaceTagsWithTag()
-        replacePathsTagsTag()
+        replacePathsTags()
     }
 
     private fun replaceTagsWithTag() {
@@ -53,7 +53,7 @@ internal class YamlProcessor(path: String, namespace: String) {
         rootMap.put(TAGS, tagsList)
     }
 
-    private fun replacePathsTagsTag() {
+    private fun replacePathsTags() {
         rootMap.mapApply(PATHS) { _, pathsMap ->
             pathsMap.forEachMap { _, pathMap ->
                 pathMap.forEachMap { _, methodMap ->
