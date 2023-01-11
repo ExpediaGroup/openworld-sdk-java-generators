@@ -71,8 +71,7 @@ internal class YamlProcessor(path: String, namespace: String) {
                 pathMap.forEachMap { _, methodMap ->
                     methodMap.listApply(PARAMETERS) { parameters ->
                         parameters.removeIf { parameter ->
-                            isUnwantedComponentsParameter(parameter, unwantedComponentsParameters)
-                                    || isUnwantedHeader(parameter)
+                            isUnwanted(parameter, unwantedComponentsParameters)
                         }
                     }
                 }
@@ -94,6 +93,9 @@ internal class YamlProcessor(path: String, namespace: String) {
         return unwantedComponentsParameters
     }
 
+    private fun isUnwanted(parameter: FunctionalMap, unwantedComponentsParameters: MutableList<String>) =
+        isUnwantedComponentsParameter(parameter, unwantedComponentsParameters) || isUnwantedHeader(parameter)
+
     private fun isUnwantedHeader(parameter: FunctionalMap) =
         parameter.get(NAME)?.let { UNWANTED_HEADERS.contains((it as String).lowercase()) } ?: false
 
@@ -110,15 +112,20 @@ internal class YamlProcessor(path: String, namespace: String) {
 
     companion object {
         private const val NAME = "name"
-        private const val PATHS = "paths"
-        private const val COMPONENTS = "components"
+        private const val REF = "\$ref"
         private const val TAGS = "tags"
         private const val TEMP = "temp"
-        private const val REF = "\$ref"
+        private const val PATHS = "paths"
+        private const val COMPONENTS = "components"
         private const val PARAMETERS = "parameters"
         private const val COMPONENTS_PARAMETER = "#/components/parameters/"
-        private val UNWANTED_HEADERS =
-            listOf("accept", "accept-encoding", "user-agent", "authorization", "content-type")
+        private val UNWANTED_HEADERS = listOf(
+            "accept",
+            "accept-encoding",
+            "user-agent",
+            "authorization",
+            "content-type"
+        )
         private val dumperOptions = DumperOptions()
 
         init {
