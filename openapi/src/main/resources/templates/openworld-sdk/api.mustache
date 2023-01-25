@@ -61,7 +61,7 @@ open class {{classname}} : {{#isRapid}}Rapid{{/isRapid}}OpenApiStub {
         @JvmStatic fun builder() = {{classname}}Builder.builder()
     }
 
-    class RapidClientBuilder internal constructor() {
+    class {{classname}}Builder internal constructor() {
         private var clientConfiguration: {{#isRapid}}Rapid{{/isRapid}}ClientConfiguration = {{#isRapid}}Rapid{{/isRapid}}ClientConfiguration.EMPTY
 
         companion object {
