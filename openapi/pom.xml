@@ -5,7 +5,7 @@
 
     <groupId>com.expediagroup.openworld.sdk</groupId>
     <artifactId>travel-sdk-generators-openapi</artifactId>
-    <version>0.4.0</version>
+    <version>0.5.0</version>
     <name>EG Open World SDK Tooling :: Generators :: OpenAPI</name>
     <description>SDK Generator for building SDKs based on OpenAPI specs</description>
     <url>https://github.com/ExpediaGroup/openworld-sdk-java-generators/tree/main/openapi</url>
