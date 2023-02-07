@@ -71,7 +71,7 @@
         <dependency>
             <groupId>com.expediagroup.openworld.sdk</groupId>
             <artifactId>openworld-java-sdk-core</artifactId>
-            <version>0.9.0</version>
+            <version>0.10.0</version>
         </dependency>
 
         <dependency>
@@ -264,7 +264,22 @@
                             </artifactSet>
 
                             <relocations>
-                            
+
+<!--                                <relocation>-->
+<!--                                    <pattern>org</pattern>-->
+<!--                                    <shadedPattern>${shadePrefix}.org</shadedPattern>-->
+<!--                                    &lt;!&ndash; Don't relocate shared component APIs &ndash;&gt;-->
+<!--                                    <excludes>-->
+<!--                                        <exclude>org.slf4j.*</exclude>>-->
+<!--                                    </excludes>-->
+<!--                                </relocation>-->
+
+                                <!-- Temp fix for the SDK Core path -->
+<!--                                <relocation>-->
+<!--                                    <pattern>com.expediagroup.sdk.core</pattern>-->
+<!--                                    <shadedPattern>com.expediagroup.openworld.sdk.core</shadedPattern>-->
+<!--                                </relocation>-->
+
                                 <!-- Everything else gets relocated -->
                                 <relocation>
                                     <pattern>io</pattern>
