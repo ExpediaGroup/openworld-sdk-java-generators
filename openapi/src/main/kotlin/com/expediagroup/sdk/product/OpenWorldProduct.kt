@@ -28,20 +28,28 @@ data class OpenWorldProduct(
     private val normalizedNamespace = normalizeNamespace(inputNamespace).lowercase()
     override val productFamily: ProductFamily
         get() = ProductFamily.OPEN_WORLD
+
     override val namespace: String
         get() = normalizedNamespace
+
     override val apiPackage: String
         get() = "com.expediagroup.openworld.sdk.$normalizedNamespace.client"
+
     override val artifactId: String
         get() = "openworld-${programmingLanguage.name}-sdk-$normalizedNamespace"
+
     override val packagePath: String
         get() = "src/main/kotlin/com/expediagroup/openworld/sdk/$normalizedNamespace"
+
     override val packageName: String
         get() = "com.expediagroup.openworld.sdk.$normalizedNamespace"
+
     override val groupId: String
         get() = "com.expediagroup.openworld.sdk"
+
     override val shadePrefix: String
         get() = "com.expediagroup.openworld.sdk"
+
     override val excludesPath: String
         get() = "com/expediagroup/rapid/**"
 }
