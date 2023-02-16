@@ -18,7 +18,6 @@ package com.expediagroup.sdk.generators.openapi
 import com.expediagroup.sdk.generators.openapi.processor.YamlProcessor
 import com.expediagroup.sdk.model.ClientGenerationException
 import com.expediagroup.sdk.product.Product
-import com.expediagroup.sdk.product.ProductFamily
 import com.expediagroup.sdk.product.ProgrammingLanguage
 import com.github.rvesse.airline.SingleCommand
 import com.github.rvesse.airline.annotations.Command
@@ -76,12 +75,9 @@ class OpenApiSdkGenerator {
     @Option(name = ["-l", "--language"])
     lateinit var programmingLanguage: String
 
-    @Option(name = ["-f", "--productFamily"])
-    lateinit var productFamily: String
-
     fun run() {
         try {
-            val product = Product.from(productFamily, programmingLanguage, namespace)
+            val product = Product(namespace, programmingLanguage)
             val config = CodegenConfigurator().apply {
                 val path = prepareSpecFile()
                 val processedFilePath = preProcessSpecFile(path)
@@ -108,13 +104,11 @@ class OpenApiSdkGenerator {
                 addAdditionalProperty("shadePrefix", product.shadePrefix)
                 addAdditionalProperty("namespace", product.namespace)
                 addAdditionalProperty("language", product.programmingLanguage.id)
-                addAdditionalProperty("productFamily", product.productFamily.id)
-                addAdditionalProperty("excludesPath", product.excludesPath)
 
                 // Template specific properties
                 addAdditionalProperty("isKotlin", ProgrammingLanguage.isKotlin(product.programmingLanguage))
-                addAdditionalProperty("isRapid", ProductFamily.isRapid(product.productFamily))
-                addAdditionalProperty("isOpenWorld", ProductFamily.isOpenWorld(product.productFamily))
+                addAdditionalProperty("isRapid", product.namespace == "rapid")
+                addAdditionalProperty("isOpenWorld", product.namespace != "rapid")
 
                 // Mustache Helpers
                 mustacheHelpers.forEach { (name, function) -> addAdditionalProperty(name, function()) }
