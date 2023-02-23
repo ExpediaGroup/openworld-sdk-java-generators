@@ -18,22 +18,19 @@ on:
 jobs:
   prepare_version:
     uses: ./.github/workflows/prepare_version.yml
-
   generate:
     uses: ./.github/workflows/generate.yml
     needs: [ prepare_version ]
     with:
-      version: ${{ steps.prepare_version.outputs.version }}
+      version: ${{ jobs.prepare_version.outputs.version }}
       name: ${{ github.event.inputs.name }}
       fileAsBase64: ${{ github.event.inputs.fileAsBase64 }}
-
   commit:
     uses: ./.github/workflows/commit.yml
     needs: [ generate ]
     with:
       version: ${{ needs.prepare_sdk_version.outputs.version }}
       name: ${{ github.event.inputs.name }}
-
   publish:
     needs: [ generate ]
     uses: ./.github/workflows/publish.yml
