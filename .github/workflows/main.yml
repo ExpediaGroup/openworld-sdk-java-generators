@@ -22,7 +22,7 @@ jobs:
     uses: ./.github/workflows/generate.yml
     needs: [ prepare_version ]
     with:
-      version: ${{ jobs.prepare_version.outputs.version }}
+      version: ${{ needs.prepare_version.outputs.version }}
       name: ${{ github.event.inputs.name }}
       fileAsBase64: ${{ github.event.inputs.fileAsBase64 }}
   commit:
