@@ -18,6 +18,9 @@ on:
 jobs:
   prepare_version:
     uses: ./.github/workflows/prepare_version.yml
+    with:
+      version: ${{ needs.prepare_version.outputs.version }}
+      name: ${{ github.event.inputs.name }}
   generate:
     uses: ./.github/workflows/generate.yml
     needs: [ prepare_version ]
