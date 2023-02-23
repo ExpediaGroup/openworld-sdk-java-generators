@@ -4,6 +4,7 @@ on:
     inputs:
       test:
         description: 'Release snapshot?'
+        type: string
         required: false
 jobs:
   job:
