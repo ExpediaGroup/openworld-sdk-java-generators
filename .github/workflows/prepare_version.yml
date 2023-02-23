@@ -14,7 +14,7 @@ jobs:
   prepare_version:
     runs-on: ubuntu-latest
     outputs:
-      version: ${{ steps.get_version.outputs.version }}
+      version: ${{ steps.prepare_version.outputs.version }}
     steps:
       - id: get_version
         run: |

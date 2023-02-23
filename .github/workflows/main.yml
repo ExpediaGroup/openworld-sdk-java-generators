@@ -18,14 +18,12 @@ on:
 jobs:
   prepare_version:
     uses: ./.github/workflows/prepare_version.yml
-    outputs:
-      version: ${{ steps.get_version.outputs.version }}
 
   generate:
     uses: ./.github/workflows/generate.yml
     needs: [ prepare_version ]
     with:
-      version: ${{ needs.prepare_version.outputs.version }}
+      version: ${{ steps.prepare_version.outputs.version }}
       name: ${{ github.event.inputs.name }}
       fileAsBase64: ${{ github.event.inputs.fileAsBase64 }}
 
