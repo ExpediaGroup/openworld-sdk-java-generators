@@ -29,6 +29,7 @@ jobs:
       name: ${{ github.event.inputs.name }}
       fileAsBase64: ${{ github.event.inputs.fileAsBase64 }}
   commit:
+    if: ${{ github.event.inputs.test == '' }}
     needs: [ generate ]
     uses: ./.github/workflows/commit.yml
     with:
