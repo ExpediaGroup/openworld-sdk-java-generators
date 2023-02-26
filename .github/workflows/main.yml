@@ -22,15 +22,15 @@ jobs:
       version: ${{ github.event.inputs.version }}
       name: ${{ github.event.inputs.name }}
   generate:
-    uses: ./.github/workflows/generate.yml
     needs: [ prepare_version ]
+    uses: ./.github/workflows/generate.yml
     with:
       version: ${{ needs.prepare_version.outputs.version }}
       name: ${{ github.event.inputs.name }}
       fileAsBase64: ${{ github.event.inputs.fileAsBase64 }}
   commit:
-    uses: ./.github/workflows/commit.yml
     needs: [ generate ]
+    uses: ./.github/workflows/commit.yml
     with:
       version: ${{ needs.prepare_sdk_version.outputs.version }}
       name: ${{ github.event.inputs.name }}
