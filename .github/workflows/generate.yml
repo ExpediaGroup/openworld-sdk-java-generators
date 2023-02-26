@@ -31,7 +31,7 @@ jobs:
         run: |
           mvn clean install
           mvn exec:java "-Dnamespace=${{ inputs.name }}" -DsdkVersion=${{ inputs.version }} "-Dspec=${{ inputs.fileAsBase64 }}"
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: sdk
           path: ./openapi/target/sdk
