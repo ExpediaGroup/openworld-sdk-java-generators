@@ -9,7 +9,7 @@ on:
         required: true
         type: string
     outputs:
-      version: ${{ jobs.prepare_version.outputs.version}}
+      version: ${{ jobs.prepare_version.outputs.version }}
 jobs:
   prepare_version:
     runs-on: ubuntu-latest
