@@ -3,20 +3,20 @@ on:
   workflow_call:
     inputs:
       version:
-        description: 'Generated SDK version'
         required: true
         type: string
       name:
-        description: 'Generated SDK name'
         required: true
         type: string
+    outputs:
+      version: ${{ jobs.prepare_version.outputs.version}}
 jobs:
   prepare_version:
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.prepare_version.outputs.version }}
     steps:
-      - id: get_version
+      - id: prepare_version
         run: |
           if [ -z "${{ github.event.inputs.version }}" ]; then
               sudo apt-get update
