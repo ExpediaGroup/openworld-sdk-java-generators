@@ -21,12 +21,6 @@ jobs:
     with:
       version: ${{ github.event.inputs.version }}
       name: ${{ github.event.inputs.name }}
-  echo:
-    needs: [ prepare_version ]
-    runs-on: ubuntu_latest
-    steps:
-      - run: |
-          echo ${{ needs.prepare_version.outputs.version }}
   generate:
     needs: [ prepare_version ]
     uses: ./.github/workflows/generate.yml
