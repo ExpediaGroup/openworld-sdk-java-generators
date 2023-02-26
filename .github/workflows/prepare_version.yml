@@ -10,7 +10,7 @@ on:
         type: string
     outputs:
       version:
-        value: {{ jobs.prepare_version.outputs.version }}
+        value: ${{ jobs.prepare_version.outputs.version }}
 jobs:
   prepare_version:
     runs-on: ubuntu-latest
