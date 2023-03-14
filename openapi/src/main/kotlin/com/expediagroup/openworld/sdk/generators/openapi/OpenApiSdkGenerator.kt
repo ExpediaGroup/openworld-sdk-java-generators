@@ -80,8 +80,7 @@ class OpenApiSdkGenerator {
         try {
             val product = Product(namespace, programmingLanguage)
             val config = CodegenConfigurator().apply {
-                val path = "/Users/nanssari/Library/Application Support/JetBrains/IntelliJIdea2022.3/scratches/reduced_fraud.yaml"
-                // val path = prepareSpecFile()
+                val path = prepareSpecFile()
                 val processedFilePath = preProcessSpecFile(path)
 
                 setGeneratorName("kotlin")
