@@ -25,6 +25,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.future.future
 import java.util.UUID
+import java.util.stream.Collectors
+import kotlin.collections.Map.Entry
 
 /**
 * {{{description}}}
@@ -129,3 +131,14 @@ import java.util.UUID
 {{/operation}}
 }
 {{/operations}}
+
+data class Response<T>(val body: T, val headers: Map<String, List<String>>)
+
+private fun toHeadersMap(entries: Set<Entry<String, List<String>>>): Map<String, List<String>> {
+    return entries.stream().collect(
+        Collectors.toMap(
+            Entry<String, List<String>>::key,
+            Entry<String, List<String>>::value
+        )
+    )
+}

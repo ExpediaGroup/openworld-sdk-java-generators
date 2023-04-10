@@ -26,6 +26,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.future.future
 import java.util.UUID
+import java.util.stream.Collectors
+import kotlin.collections.Map.Entry
 
 /**
 * {{{description}}}
@@ -64,6 +66,10 @@ import java.util.UUID
 
 {{#operation}}
     {{^isKotlin}}private {{/isKotlin}}suspend {{^isKotlin}}inline {{/isKotlin}}fun {{^isKotlin}}k{{/isKotlin}}{{operationId}}({{>apiParamsDecleration}}): {{{returnType}}}{{^returnType}}Void?{{/returnType}} {
+        return {{^isKotlin}}k{{/isKotlin}}{{operationId}}WithResponse({{>apiParamsPassed}}){{#returnType}}.body{{/returnType}}
+    }
+
+    {{^isKotlin}}private {{/isKotlin}}suspend {{^isKotlin}}inline {{/isKotlin}}fun {{^isKotlin}}k{{/isKotlin}}{{operationId}}WithResponse({{>apiParamsDecleration}}): {{#returnType}}Response<{{{returnType}}}>{{/returnType}}{{^returnType}}Void?{{/returnType}} {
         val response = httpClient.request {
             method = HttpMethod.parse("{{httpMethod}}")
             url("{{#removeLeadingSlash}}{{path}}{{/removeLeadingSlash}}"{{#pathParams}}.replace("{" + "{{baseName}}" + "}", {{#isContainer}}{{paramName}}.joinToString(","){{/isContainer}}{{^isContainer}}"${{{paramName}}}"{{/isContainer}}){{/pathParams}})
@@ -99,7 +105,7 @@ import java.util.UUID
         {{/hasBodyParam}}
         }
         throwIfError(response)
-        return {{^returnType}}null{{/returnType}}{{#returnType}}response.body(){{/returnType}}
+        return {{^returnType}}null{{/returnType}}{{#returnType}}Response(response.body<{{{returnType}}}>(), toHeadersMap(response.headers.entries())){{/returnType}}
     }
     {{^isKotlin}}
 
@@ -113,9 +119,22 @@ import java.util.UUID
     */
     @JvmOverloads
     fun {{operationId}}({{>apiParamsDecleration}}) : {{{returnType}}}{{^returnType}}Void?{{/returnType}} {
+        return {{operationId}}WithResponse({{>apiParamsPassed}}){{#returnType}}.body{{/returnType}}
+    }
+
+    /**
+    * {{summary}}
+    * {{notes}}
+    {{#queryParams}} * @param {{{paramName}}} {{description}}{{^required}} (optional{{#defaultValue}}, default to {{{.}}}{{/defaultValue}}){{/required}}{{#required}}{{#defaultValue}} (default to {{{.}}}){{/defaultValue}}{{/required}}
+    {{/queryParams}}{{#bodyParams}} * @param {{{paramName}}} {{description}}{{^required}} (optional{{#defaultValue}}, default to {{{.}}}{{/defaultValue}}){{/required}}{{#required}}{{#defaultValue}} (default to {{{.}}}){{/defaultValue}}{{/required}}
+    {{/bodyParams}} {{#formParams}} * @param {{{paramName}}} {{description}}{{^required}} (optional{{#defaultValue}}, default to {{{.}}}{{/defaultValue}}){{/required}}{{#required}}{{#defaultValue}} (default to {{{.}}}){{/defaultValue}}{{/required}}
+    {{/formParams}}* @return {{{returnType}}}{{^returnType}}void{{/returnType}}
+    */
+    @JvmOverloads
+    fun {{operationId}}WithResponse({{>apiParamsDecleration}}) : {{#returnType}}Response<{{{returnType}}}>{{/returnType}}{{^returnType}}Void?{{/returnType}} {
         try {
             return GlobalScope.future(Dispatchers.IO) {
-                k{{operationId}}({{>apiParamsPassed}})
+                k{{operationId}}WithResponse({{>apiParamsPassed}})
             }.get()
         } catch (exception: Exception) {
             if (exception is OpenWorldException) throw exception
@@ -130,3 +149,14 @@ import java.util.UUID
 {{/operation}}
 }
 {{/operations}}
+
+data class Response<T>(val body: T, val headers: Map<String, List<String>>)
+
+private fun toHeadersMap(entries: Set<Entry<String, List<String>>>): Map<String, List<String>> {
+    return entries.stream().collect(
+        Collectors.toMap(
+            Entry<String, List<String>>::key,
+            Entry<String, List<String>>::value
+        )
+    )
+}
