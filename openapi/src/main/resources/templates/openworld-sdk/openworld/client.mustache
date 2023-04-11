@@ -56,7 +56,7 @@ import kotlin.collections.Map.Entry
     }
 
      override suspend fun throwServiceException(response: HttpResponse) {
-         runCatching {
+         run {
             response.body<Error>()
          }.getOrThrow().let {
             throw OpenWorldServiceException(it.toString())
@@ -65,6 +65,10 @@ import kotlin.collections.Map.Entry
 
 {{#operation}}
     {{^isKotlin}}private {{/isKotlin}}suspend {{^isKotlin}}inline {{/isKotlin}}fun {{^isKotlin}}k{{/isKotlin}}{{operationId}}({{>apiParamsDecleration}}): {{{returnType}}}{{^returnType}}Void?{{/returnType}} {
+        return {{^isKotlin}}k{{/isKotlin}}{{operationId}}WithResponse({{>apiParamsPassed}}){{#returnType}}.body{{/returnType}}
+    }
+
+    {{^isKotlin}}private {{/isKotlin}}suspend {{^isKotlin}}inline {{/isKotlin}}fun {{^isKotlin}}k{{/isKotlin}}{{operationId}}WithResponse({{>apiParamsDecleration}}): {{#returnType}}Response<{{{returnType}}}>{{/returnType}}{{^returnType}}Void?{{/returnType}} {
         val response = httpClient.request {
             method = HttpMethod.parse("{{httpMethod}}")
             url("{{#removeLeadingSlash}}{{path}}{{/removeLeadingSlash}}"{{#pathParams}}.replace("{" + "{{baseName}}" + "}", {{#isContainer}}{{paramName}}.joinToString(","){{/isContainer}}{{^isContainer}}"${{{paramName}}}"{{/isContainer}}){{/pathParams}})
@@ -100,7 +104,7 @@ import kotlin.collections.Map.Entry
         {{/hasBodyParam}}
         }
         throwIfError(response)
-        return {{^returnType}}null{{/returnType}}{{#returnType}}response.body(){{/returnType}}
+        return {{^returnType}}null{{/returnType}}{{#returnType}}Response(response.body<{{{returnType}}}>(), toHeadersMap(response.headers.entries())){{/returnType}}
     }
     {{^isKotlin}}
 
@@ -114,9 +118,22 @@ import kotlin.collections.Map.Entry
     */
     @JvmOverloads
     fun {{operationId}}({{>apiParamsDecleration}}) : {{{returnType}}}{{^returnType}}Void?{{/returnType}} {
+        return {{operationId}}WithResponse({{>apiParamsPassed}}){{#returnType}}.body{{/returnType}}
+    }
+
+    /**
+     * {{summary}}
+     * {{notes}}
+    {{#queryParams}} * @param {{{paramName}}} {{description}}{{^required}} (optional{{#defaultValue}}, default to {{{.}}}{{/defaultValue}}){{/required}}{{#required}}{{#defaultValue}} (default to {{{.}}}){{/defaultValue}}{{/required}}
+    {{/queryParams}}{{#bodyParams}} * @param {{{paramName}}} {{description}}{{^required}} (optional{{#defaultValue}}, default to {{{.}}}{{/defaultValue}}){{/required}}{{#required}}{{#defaultValue}} (default to {{{.}}}){{/defaultValue}}{{/required}}
+    {{/bodyParams}} {{#formParams}} * @param {{{paramName}}} {{description}}{{^required}} (optional{{#defaultValue}}, default to {{{.}}}{{/defaultValue}}){{/required}}{{#required}}{{#defaultValue}} (default to {{{.}}}){{/defaultValue}}{{/required}}
+    {{/formParams}}* @return {{{returnType}}}{{^returnType}}void{{/returnType}}
+    */
+    @JvmOverloads
+    fun {{operationId}}WithResponse({{>apiParamsDecleration}}) : {{#returnType}}Response<{{{returnType}}}>{{/returnType}}{{^returnType}}Void?{{/returnType}} {
         try {
             return GlobalScope.future(Dispatchers.IO) {
-                k{{operationId}}({{>apiParamsPassed}})
+                k{{operationId}}WithResponse({{>apiParamsPassed}})
             }.get()
         } catch (exception: Exception) {
             if (exception is OpenWorldException) throw exception
