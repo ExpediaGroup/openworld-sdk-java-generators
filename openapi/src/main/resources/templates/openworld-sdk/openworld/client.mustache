@@ -56,7 +56,7 @@ import kotlin.collections.Map.Entry
     }
 
      override suspend fun throwServiceException(response: HttpResponse) {
-         run {
+         runCatching {
             response.body<Error>()
          }.getOrThrow().let {
             throw OpenWorldServiceException(it.toString())
