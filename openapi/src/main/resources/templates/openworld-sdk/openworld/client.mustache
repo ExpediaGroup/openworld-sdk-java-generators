@@ -136,11 +136,11 @@ import kotlin.collections.Map.Entry
         }
     }
     {{/isKotlin}}
+{{/operation}}
 
     private val paginationClient = PaginationClient(this)
 
     fun paginationClient() = paginationClient
-{{/operation}}
 }
 {{>paginationClient}}
 {{/operations}}

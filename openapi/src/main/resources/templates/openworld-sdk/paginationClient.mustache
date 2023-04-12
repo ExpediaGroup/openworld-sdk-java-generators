@@ -3,7 +3,7 @@ class PaginationClient internal constructor(private val client: {{classname}}) {
     {{#returnType}}
     @JvmOverloads
     fun {{operationId}}({{>apiParamsDecleration}}): ResponsePaginator<{{{returnType}}}> {
-        val response client.{{operationId}}WithResponse({{>apiParamsPassed}})
+        val response = client.{{operationId}}WithResponse({{>apiParamsPassed}})
         return ResponsePaginator(client, response) { it.body<{{{returnType}}}>() }
     }
     {{/returnType}}
