@@ -68,7 +68,7 @@ import kotlin.collections.Map.Entry
         return {{^isKotlin}}k{{/isKotlin}}{{operationId}}WithResponse({{>apiParamsPassed}}){{#returnType}}.body{{/returnType}}
     }
 
-    private suspend {{^isKotlin}}inline {{/isKotlin}}fun {{^isKotlin}}k{{/isKotlin}}{{operationId}}WithResponse({{>apiParamsDecleration}}): {{#returnType}}Response<{{{returnType}}}>{{/returnType}}{{^returnType}}Void?{{/returnType}} {
+    internal suspend {{^isKotlin}}inline {{/isKotlin}}fun {{^isKotlin}}k{{/isKotlin}}{{operationId}}WithResponse({{>apiParamsDecleration}}): {{#returnType}}Response<{{{returnType}}}>{{/returnType}}{{^returnType}}Void?{{/returnType}} {
         val response = httpClient.request {
             method = HttpMethod.parse("{{httpMethod}}")
             url("{{#removeLeadingSlash}}{{path}}{{/removeLeadingSlash}}"{{#pathParams}}.replace("{" + "{{baseName}}" + "}", {{#isContainer}}{{paramName}}.joinToString(","){{/isContainer}}{{^isContainer}}"${{{paramName}}}"{{/isContainer}}){{/pathParams}})
@@ -121,7 +121,7 @@ import kotlin.collections.Map.Entry
         return {{operationId}}WithResponse({{>apiParamsPassed}}){{#returnType}}.body{{/returnType}}
     }
 
-    private fun {{operationId}}WithResponse({{>apiParamsDecleration}}) : {{#returnType}}Response<{{{returnType}}}>{{/returnType}}{{^returnType}}Void?{{/returnType}} {
+    internal fun {{operationId}}WithResponse({{>apiParamsDecleration}}) : {{#returnType}}Response<{{{returnType}}}>{{/returnType}}{{^returnType}}Void?{{/returnType}} {
         try {
             return GlobalScope.future(Dispatchers.IO) {
                 k{{operationId}}WithResponse({{>apiParamsPassed}})
