@@ -43,9 +43,10 @@ class OpenApiSdkGenerator {
     private val supportingFiles = listOf(
         "pom.xml",
         "README.md",
-        "PropertyConstraintViolationException.kt",
+        "Response.kt",
         "PropertyConstraintViolation.kt",
-        "PropertyConstraintsValidator.kt"
+        "PropertyConstraintsValidator.kt",
+        "PropertyConstraintViolationException.kt"
     )
 
     companion object {
@@ -121,6 +122,7 @@ class OpenApiSdkGenerator {
                     listOf(
                         TemplateDefinition("pom.mustache", "pom.xml"),
                         TemplateDefinition("README.mustache", "README.md"),
+                        TemplateDefinition("response.mustache", "Response.kt"),
                         TemplateDefinition(
                             "factory.mustache",
                             "$packagePath/configs"
