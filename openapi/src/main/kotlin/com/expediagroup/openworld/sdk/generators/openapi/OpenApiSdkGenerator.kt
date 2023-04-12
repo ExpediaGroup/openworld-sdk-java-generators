@@ -44,6 +44,7 @@ class OpenApiSdkGenerator {
         "pom.xml",
         "README.md",
         "Response.kt",
+        "ResponsePaginator.kt",
         "PropertyConstraintViolation.kt",
         "PropertyConstraintsValidator.kt",
         "PropertyConstraintViolationException.kt"
@@ -123,6 +124,7 @@ class OpenApiSdkGenerator {
                         TemplateDefinition("pom.mustache", "pom.xml"),
                         TemplateDefinition("README.mustache", "README.md"),
                         TemplateDefinition("response.mustache", "Response.kt"),
+                        TemplateDefinition("responsePaginator.mustache", "ResponsePaginator.kt"),
                         TemplateDefinition(
                             "factory.mustache",
                             "$packagePath/configs"
