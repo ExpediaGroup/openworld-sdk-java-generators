@@ -1,3 +1,4 @@
+{{#operations}}
 class PaginationClient internal constructor(private val client: {{classname}}) {
 {{#operation}}
     {{#returnType}}
@@ -9,3 +10,4 @@ class PaginationClient internal constructor(private val client: {{classname}}) {
     {{/returnType}}
 {{/operation}}
 }
+{{/operations}}
