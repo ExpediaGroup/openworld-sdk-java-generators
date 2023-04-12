@@ -23,16 +23,18 @@ import com.expediagroup.openworld.sdk.product.ProgrammingLanguage
 import com.github.rvesse.airline.SingleCommand
 import com.github.rvesse.airline.annotations.Command
 import com.github.rvesse.airline.annotations.Option
-import kotlin.io.path.writeBytes
 import org.openapitools.codegen.DefaultGenerator
+import org.openapitools.codegen.SupportingFile
 import org.openapitools.codegen.api.TemplateDefinition
+import org.openapitools.codegen.api.TemplateFileType.API
 import org.openapitools.codegen.config.CodegenConfigurator
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.nio.file.Files
-import java.util.*
+import java.util.Base64
 import java.util.zip.ZipInputStream
+import kotlin.io.path.writeBytes
 
 /**
  * Configures the OpenAPI Generator based on command line parameters to generate an EG Travel SDK project
@@ -119,27 +121,26 @@ class OpenApiSdkGenerator {
 
             val generatorInput = config.toClientOptInput().apply {
                 val packagePath = product.packagePath
+                val responsePaginatorTemplate = TemplateDefinition("responsePaginator.mustache", "$packagePath/client/", "ResponsePaginator.kt")
+                responsePaginatorTemplate.templateType = API
                 userDefinedTemplates(
                     listOf(
-                        TemplateDefinition("pom.mustache", "pom.xml"),
-                        TemplateDefinition("README.mustache", "README.md"),
-                        TemplateDefinition("response.mustache", "Response.kt"),
-                        TemplateDefinition("responsePaginator.mustache", "ResponsePaginator.kt"),
-                        TemplateDefinition(
-                            "factory.mustache",
-                            "$packagePath/configs"
-                        ),
-                        TemplateDefinition(
+                        responsePaginatorTemplate,
+                        SupportingFile("pom.mustache", "pom.xml"),
+                        SupportingFile("README.mustache", "README.md"),
+                        SupportingFile("response.mustache", "$packagePath/client/", "Response.kt"),
+                        SupportingFile("factory.mustache", "$packagePath/configs"),
+                        SupportingFile(
                             "propertyConstraintViolationException.mustache",
                             "$packagePath/models/exception/",
                             "PropertyConstraintViolationException.kt"
                         ),
-                        TemplateDefinition(
+                        SupportingFile(
                             "propertyConstraintViolation.mustache",
                             "$packagePath/models/exception/",
                             "PropertyConstraintViolation.kt"
                         ),
-                        TemplateDefinition(
+                        SupportingFile(
                             "propertyConstraintsValidator.mustache",
                             "$packagePath/validation/",
                             "PropertyConstraintsValidator.kt"

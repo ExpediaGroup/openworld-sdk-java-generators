@@ -138,6 +138,14 @@ import kotlin.collections.Map.Entry
     {{/isKotlin}}
 {{/operation}}
 
+    internal suspend fun getFromLink(link: String): HttpResponse {
+        return httpClient.request {
+            method = HttpMethod.parse("GET")
+            url(link)
+            appendHeaders(UUID.randomUUID())
+        }
+    }
+
     private val paginationClient = PaginationClient(this)
 
     fun paginationClient() = paginationClient
