@@ -1,20 +1,3 @@
-{{>licenseInfo}}
-package {{apiPackage}}
-
-{{#operations}}
-    {{#operation}}
-        {{#vendorExtensions}}
-            {{#x-sdk-paginated}}
-                {{#returnType}}
-import {{packageName}}.models.{{returnBaseType}}
-                {{/returnType}}
-            {{/x-sdk-paginated}}
-        {{/vendorExtensions}}
-    {{/operation}}
-{{/operations}}
-import io.ktor.client.call.body
-import java.util.UUID
-
 {{#operations}}
 class PaginationClient internal constructor(private val client: {{classname}}) {
 {{#operation}}

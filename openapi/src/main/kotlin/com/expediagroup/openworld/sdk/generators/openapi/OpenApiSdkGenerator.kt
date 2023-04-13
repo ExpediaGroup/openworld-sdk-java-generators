@@ -44,7 +44,6 @@ class OpenApiSdkGenerator {
     private val supportingFiles = listOf(
         "pom.xml",
         "README.md",
-        "Response.kt",
         "PropertyConstraintViolation.kt",
         "PropertyConstraintsValidator.kt",
         "PropertyConstraintViolationException.kt"
@@ -123,9 +122,6 @@ class OpenApiSdkGenerator {
                     listOf(
                         SupportingFile("pom.mustache", "pom.xml"),
                         SupportingFile("README.mustache", "README.md"),
-                        SupportingFile("response.mustache", "$packagePath/client/", "Response.kt"),
-                        ApiTemplate("responsePaginator.mustache", "ResponsePaginator.kt"),
-                        ApiTemplate("paginationClient.mustache", "PaginationClient.kt"),
                         SupportingFile(
                             "propertyConstraintViolationException.mustache",
                             "$packagePath/models/exception/",

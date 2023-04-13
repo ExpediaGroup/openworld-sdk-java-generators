@@ -1,9 +1,3 @@
-{{>licenseInfo}}
-package {{apiPackage}}
-
-import io.ktor.client.statement.HttpResponse
-import kotlinx.coroutines.runBlocking
-
 {{#operations}}
 class ResponsePaginator<T>(
     private val client: {{classname}},

@@ -1,9 +1,3 @@
-{{>licenseInfo}}
-package {{apiPackage}}
-
-import java.util.stream.Collectors
-import kotlin.collections.Map.Entry
-
 data class Response<T>(val body: T, val headers: Map<String, List<String>>)
 
 internal fun toHeadersMap(entries: Set<Entry<String, List<String>>>): Map<String, List<String>> {
