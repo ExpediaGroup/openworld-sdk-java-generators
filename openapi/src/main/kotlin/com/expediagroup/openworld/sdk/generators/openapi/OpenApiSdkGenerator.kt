@@ -44,8 +44,6 @@ class OpenApiSdkGenerator {
         "pom.xml",
         "README.md",
         "Response.kt",
-        "PaginationClient.kt",
-        "ResponsePaginator.kt",
         "PropertyConstraintViolation.kt",
         "PropertyConstraintsValidator.kt",
         "PropertyConstraintViolationException.kt"
