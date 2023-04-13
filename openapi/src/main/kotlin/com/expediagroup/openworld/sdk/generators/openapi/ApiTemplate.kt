@@ -20,9 +20,8 @@ import org.openapitools.codegen.api.TemplateFileType.API
 
 class ApiTemplate(
     templateFile: String,
-    folder: String,
     destinationFilename: String
-) : TemplateDefinition(templateFile, folder, destinationFilename) {
+) : TemplateDefinition(templateFile, destinationFilename) {
     init {
         this.templateType = API
     }

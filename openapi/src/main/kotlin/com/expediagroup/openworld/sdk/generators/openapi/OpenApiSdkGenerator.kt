@@ -123,9 +123,8 @@ class OpenApiSdkGenerator {
                         SupportingFile("pom.mustache", "pom.xml"),
                         SupportingFile("README.mustache", "README.md"),
                         SupportingFile("response.mustache", "$packagePath/client/", "Response.kt"),
-                        SupportingFile("factory.mustache", "$packagePath/configs"),
-                        ApiTemplate("responsePaginator.mustache", "$packagePath/client/", "ResponsePaginator.kt"),
-                        ApiTemplate("paginationClient.mustache", "$packagePath/client/", "PaginationClient.kt"),
+                        ApiTemplate("responsePaginator.mustache", "ResponsePaginator.kt"),
+                        ApiTemplate("paginationClient.mustache", "PaginationClient.kt"),
                         SupportingFile(
                             "propertyConstraintViolationException.mustache",
                             "$packagePath/models/exception/",
