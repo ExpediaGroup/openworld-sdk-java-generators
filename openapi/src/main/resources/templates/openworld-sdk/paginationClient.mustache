@@ -1,3 +1,13 @@
+package {{apiPackage}}
+
+{{#imports}}
+    import {{import}}
+{{/imports}}
+import {{packageName}}.client.ResponsePaginator
+import {{packageName}}.client.{{classname}}
+import io.ktor.client.call.body
+import java.util.UUID
+
 {{#operations}}
 class PaginationClient internal constructor(private val client: {{classname}}) {
 {{#operation}}

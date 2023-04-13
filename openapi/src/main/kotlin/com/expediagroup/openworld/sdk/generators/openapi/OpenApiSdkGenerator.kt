@@ -25,8 +25,6 @@ import com.github.rvesse.airline.annotations.Command
 import com.github.rvesse.airline.annotations.Option
 import org.openapitools.codegen.DefaultGenerator
 import org.openapitools.codegen.SupportingFile
-import org.openapitools.codegen.api.TemplateDefinition
-import org.openapitools.codegen.api.TemplateFileType.API
 import org.openapitools.codegen.config.CodegenConfigurator
 import java.io.File
 import java.io.FileInputStream
@@ -46,6 +44,7 @@ class OpenApiSdkGenerator {
         "pom.xml",
         "README.md",
         "Response.kt",
+        "PaginationClient.kt",
         "ResponsePaginator.kt",
         "PropertyConstraintViolation.kt",
         "PropertyConstraintsValidator.kt",
@@ -121,15 +120,14 @@ class OpenApiSdkGenerator {
 
             val generatorInput = config.toClientOptInput().apply {
                 val packagePath = product.packagePath
-                val responsePaginatorTemplate = TemplateDefinition("responsePaginator.mustache", "$packagePath/client/", "ResponsePaginator.kt")
-                responsePaginatorTemplate.templateType = API
                 userDefinedTemplates(
                     listOf(
-                        responsePaginatorTemplate,
                         SupportingFile("pom.mustache", "pom.xml"),
                         SupportingFile("README.mustache", "README.md"),
                         SupportingFile("response.mustache", "$packagePath/client/", "Response.kt"),
                         SupportingFile("factory.mustache", "$packagePath/configs"),
+                        ApiTemplate("responsePaginator.mustache", "$packagePath/client/", "ResponsePaginator.kt"),
+                        ApiTemplate("paginationClient.mustache", "$packagePath/client/", "PaginationClient.kt"),
                         SupportingFile(
                             "propertyConstraintViolationException.mustache",
                             "$packagePath/models/exception/",
