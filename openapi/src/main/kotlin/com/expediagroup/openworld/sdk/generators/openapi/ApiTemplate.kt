@@ -16,13 +16,13 @@
 package com.expediagroup.openworld.sdk.generators.openapi
 
 import org.openapitools.codegen.api.TemplateDefinition
-import org.openapitools.codegen.api.TemplateFileType.API
+import org.openapitools.codegen.api.TemplateFileType
 
 class ApiTemplate(
     templateFile: String,
     destinationFilename: String
 ) : TemplateDefinition(templateFile, destinationFilename) {
     init {
-        this.templateType = API
+        this.templateType = TemplateFileType.API
     }
 }
