@@ -1,0 +1,13 @@
+{{#operation}}
+    {{#vendorExtensions}}
+        {{#x-sdk-paginated}}
+            {{#returnType}}
+                @JvmOverloads
+                fun {{operationId}}Paginated({{>apiParamsDecleration}}): ResponsePaginator<{{{returnType}}}> {
+                    val response = {{operationId}}WithResponse({{>apiParamsPassed}})
+                    return ResponsePaginator(this, response) { it.body<{{{returnType}}}>() }
+                }
+            {{/returnType}}
+        {{/x-sdk-paginated}}
+    {{/vendorExtensions}}
+{{/operation}}
