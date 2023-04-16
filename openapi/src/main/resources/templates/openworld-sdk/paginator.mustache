@@ -1,5 +1,5 @@
 {{#operations}}
-class ResponsePaginator<T>(
+class Paginator<T>(
     private val client: {{classname}},
     firstResponse: Response<T>,
     private val getBody: suspend (HttpResponse) -> T
