@@ -81,7 +81,7 @@ class OpenApiSdkGenerator {
         try {
             val product = Product(namespace, programmingLanguage)
             val config = CodegenConfigurator().apply {
-                val path = "/Users/osamasalman/IdeaProjects/openworld-sdk-java-generators/openapi/src/test/resources/specs/rapid-api.yaml"
+                val path = "../rapid-api.yaml"
                 val processedFilePath = preProcessSpecFile(path)
 
                 setGeneratorName("kotlin")
