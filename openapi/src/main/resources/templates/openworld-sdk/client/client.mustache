@@ -64,7 +64,7 @@ import java.util.UUID
         return {{^isKotlin}}k{{/isKotlin}}{{operationId}}WithResponse({{>client/apiParamsPassed}}){{#returnType}}.body{{/returnType}}
     }
 
-    internal suspend {{^isKotlin}}inline {{/isKotlin}}fun {{^isKotlin}}k{{/isKotlin}}{{operationId}}WithResponse({{>client/apiParamsDecleration}}): {{#returnType}}Response<{{{returnType}}}>{{/returnType}}{{^returnType}}Void?{{/returnType}} {
+    private suspend {{^isKotlin}}inline {{/isKotlin}}fun {{^isKotlin}}k{{/isKotlin}}{{operationId}}WithResponse({{>client/apiParamsDecleration}}): {{#returnType}}Response<{{{returnType}}}>{{/returnType}}{{^returnType}}Void?{{/returnType}} {
         val response = httpClient.request {
             method = HttpMethod.parse("{{httpMethod}}")
             url("{{#removeLeadingSlash}}{{path}}{{/removeLeadingSlash}}"{{#pathParams}}.replace("{" + "{{baseName}}" + "}", {{#isContainer}}{{paramName}}.joinToString(","){{/isContainer}}{{^isContainer}}"${{{paramName}}}"{{/isContainer}}){{/pathParams}})
@@ -117,7 +117,7 @@ import java.util.UUID
         return {{operationId}}WithResponse({{>client/apiParamsPassed}}){{#returnType}}.body{{/returnType}}
     }
 
-    internal fun {{operationId}}WithResponse({{>client/apiParamsDecleration}}) : {{#returnType}}Response<{{{returnType}}}>{{/returnType}}{{^returnType}}Void?{{/returnType}} {
+    private fun {{operationId}}WithResponse({{>client/apiParamsDecleration}}) : {{#returnType}}Response<{{{returnType}}}>{{/returnType}}{{^returnType}}Void?{{/returnType}} {
         try {
             return GlobalScope.future(Dispatchers.IO) {
                 k{{operationId}}WithResponse({{>client/apiParamsPassed}})
