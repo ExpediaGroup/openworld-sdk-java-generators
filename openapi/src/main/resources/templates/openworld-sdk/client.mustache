@@ -3,9 +3,9 @@ import {{import}}
 {{/imports}}
 import {{packageName}}.validation.PropertyConstraintsValidator.validateConstraints
 
-import com.expediagroup.openworld.sdk.core.client.BaseRapidClient
+import com.expediagroup.openworld.sdk.core.client.{{>clientBase}}
 import com.expediagroup.openworld.sdk.core.config.provider.FileConfigurationProvider
-import com.expediagroup.openworld.sdk.core.configuration.RapidClientConfiguration
+import com.expediagroup.openworld.sdk.core.configuration.{{>clientConfiguration}}
 import com.expediagroup.openworld.sdk.core.model.exception.OpenWorldException
 import com.expediagroup.openworld.sdk.core.model.exception.service.OpenWorldServiceException
 
@@ -28,16 +28,16 @@ import java.util.UUID
 * {{{description}}}
 */
 {{#operations}}
- class {{classname}} private constructor(clientConfiguration: RapidClientConfiguration) : BaseRapidClient(clientConfiguration){
+ class {{classname}} private constructor(clientConfiguration: {{>clientConfiguration}}) : {{>clientBase}}(clientConfiguration){
     private val loader = FileConfigurationProvider()[javaClass.classLoader.getResource("sdk.properties")!!]
     private val javaVersion = System.getProperty("java.version")
     private val operatingSystemName = System.getProperty("os.name")
     private val operatingSystemVersion = System.getProperty("os.version")
     private val userAgent = "open-world-sdk-{{#isKotlin}}kotlin{{/isKotlin}}{{^isKotlin}}java{{/isKotlin}}-{{namespace}}/${loader.data()["sdk-version"]!!} (Java $javaVersion; $operatingSystemName $operatingSystemVersion)"
 
-    class Builder : BaseRapidClient.Builder<Builder>() {
+    class Builder : {{>clientBase}}.Builder<Builder>() {
         override fun build(): {{classname}} = {{classname}}(
-            RapidClientConfiguration(key, secret, endpoint, requestTimeout)
+            {{>clientConfiguration}}(key, secret, endpoint, requestTimeout {{>authEndpoint}})
         )
     }
 
