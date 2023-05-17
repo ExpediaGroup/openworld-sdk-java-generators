@@ -56,6 +56,7 @@ class OpenApiSdkGenerator {
          * Parses command line arguments and then generates an EG Travel SDK
          */
         @JvmStatic
+        @Suppress("SpreadOperator")
         fun main(args: Array<String>) {
             val generator = SingleCommand.singleCommand(OpenApiSdkGenerator::class.java).parse(*args)
             generator.run()
@@ -77,6 +78,7 @@ class OpenApiSdkGenerator {
     @Option(name = ["-l", "--language"])
     lateinit var programmingLanguage: String
 
+    @Suppress("TooGenericExceptionCaught", "LongMethod")
     fun run() {
         try {
             val product = Product(namespace, programmingLanguage)
@@ -153,6 +155,7 @@ class OpenApiSdkGenerator {
         return yamlProcessor.process()
     }
 
+    @Suppress("MagicNumber")
     private fun prepareSpecFile(): String {
         val buffer = ByteArray(1024)
         val zipInputStream = ZipInputStream(FileInputStream(prepareTmpZipFile()))

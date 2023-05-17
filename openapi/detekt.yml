@@ -1,0 +1,13 @@
+style:
+  MaxLineLength:
+    maxLineLength: 200
+  ClassOrdering:
+    active: false
+  ReturnCount:
+    max: 3
+  ForbiddenComment:
+    values: [FIXME:', 'STOPSHIP:']
+
+naming:
+  FunctionMaxLength:
+    active: false

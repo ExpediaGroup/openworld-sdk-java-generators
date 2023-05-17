@@ -73,7 +73,11 @@
         <maven.licence.plugin.version>4.1</maven.licence.plugin.version>
         <maven.nexus-staging.plugin.version>1.6.13</maven.nexus-staging.plugin.version>
 
-        <ktlint-plugin.version>1.16.0</ktlint-plugin.version>
+        <ktlint-plugin.version>1.15.2</ktlint-plugin.version>
+        <maven.antrun.plugin.version>3.1.0</maven.antrun.plugin.version>
+
+        <ktlint.version>0.49.1</ktlint.version>
+        <detekt.version>1.22.0</detekt.version>
     </properties>
 
     <dependencies>
@@ -97,6 +101,7 @@
     </dependencies>
 
     <build>
+
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -202,8 +207,7 @@
                         </goals>
                         <configuration>
                             <sources>
-                                <source>
-                                ${project.basedir}/src/main/kotlin</source>
+                                <source>${project.basedir}/src/main/kotlin</source>
                             </sources>
                         </configuration>
                     </execution>
@@ -215,8 +219,7 @@
                         </goals>
                         <configuration>
                             <sources>
-                                <source>
-                                ${project.basedir}/src/test/kotlin</source>
+                                <source>${project.basedir}/src/test/kotlin</source>
                             </sources>
                         </configuration>
                     </execution>
@@ -279,19 +282,103 @@
 
             <!-- Configure Kotlin Linting -->
             <plugin>
-                <groupId>com.github.gantsign.maven</groupId>
-                <artifactId>ktlint-maven-plugin</artifactId>
-                <version>${ktlint-plugin.version}</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>${maven.antrun.plugin.version}</version>
                 <executions>
                     <execution>
-                        <id>format</id>
+                        <!-- this can be run separately with mvn clean antrun:run@detekt -->
+                        <id>detekt</id>
+                        <phase>verify</phase>
+                        <configuration>
+                            <target name="detekt">
+                                <java taskname="detekt" dir="${project.basedir}" fork="true" failonerror="true"
+                                      classname="io.gitlab.arturbosch.detekt.cli.Main"
+                                      classpathref="maven.plugin.classpath">
+                                    <arg value="--input"/>
+                                    <arg value="${project.basedir}${file.separator}src"/>
+                                    <arg value="--config"/>
+                                    <arg value="${project.basedir}${file.separator}detekt.yml"/>
+                                    <arg value="--report"/>
+                                    <arg value="html:${project.basedir}${file.separator}target${file.separator}site${file.separator}detekt.html"/>
+                                    <arg value="--report"/>
+                                    <arg value="xml:${project.basedir}${file.separator}target${file.separator}site${file.separator}detekt.xml"/>
+                                    <arg value="--build-upon-default-config"/>
+                                    <arg value="--all-rules"/>
+                                </java>
+                            </target>
+                        </configuration>
                         <goals>
-                            <goal>format</goal>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>ktlint-format</id>
+                        <phase>compile</phase>
+                        <configuration>
+                            <target name="ktlint">
+                                <java taskname="ktlint" dir="${project.basedir}" fork="true" failonerror="true"
+                                      classname="com.pinterest.ktlint.Main" classpathref="maven.plugin.classpath">
+                                    <arg value="-F"/>
+                                    <arg value="src/**/*.kt"/>
+                                </java>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <!-- this can be run separately with mvn clean antrun:run@ktlint -->
+                        <id>ktlint</id>
+                        <phase>verify</phase>
+                        <configuration>
+                            <target name="ktlint">
+                                <java taskname="ktlint" dir="${project.basedir}/src/main/kotlin" fork="true" failonerror="true"
+                                      classname="com.pinterest.ktlint.Main" classpathref="maven.plugin.classpath">
+                                    <arg value="src/**/*.kt"/>
+                                    <arg value="--reporter=plain"/>
+                                    <arg value="--reporter=checkstyle,output=${project.build.directory}/ktlint.xml"/>
+                                </java>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
                         </goals>
                     </execution>
                 </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>io.gitlab.arturbosch.detekt</groupId>
+                        <artifactId>detekt-cli</artifactId>
+                        <version>${detekt.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.pinterest</groupId>
+                        <artifactId>ktlint</artifactId>
+                        <version>${ktlint.version}</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
+
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>com.github.gantsign.maven</groupId>
+                    <artifactId>ktlint-maven-plugin</artifactId>
+                    <version>${ktlint-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>check</id>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
 
     <profiles>
