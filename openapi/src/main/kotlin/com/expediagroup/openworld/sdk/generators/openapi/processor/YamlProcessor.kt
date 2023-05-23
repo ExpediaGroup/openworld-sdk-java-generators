@@ -26,6 +26,7 @@ import java.util.*
 import kotlin.io.path.Path
 import kotlin.io.path.inputStream
 
+@Suppress("TooManyFunctions")
 internal class YamlProcessor(path: String, namespace: String) {
     private val yaml = Yaml(dumperOptions)
     private val rootMap: FunctionalMap
